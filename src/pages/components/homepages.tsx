@@ -40,7 +40,7 @@ export const Homepages = () => {
 
             {/* Second Image */}
             <div className="mt-8 lg:mt-0 lg:absolute lg:right-0 lg:bottom-0 lg:translate-y-20">
-              <div className="w-40 h-55 sm:w-40 sm:h-55 md:w-56 md:h-56 rounded-[50%] bg-modus-orange overflow-hidden mx-auto lg:mx-0">
+              <div className="w-40 h-55 sm:w-40 sm:h-55 md:w-56 md:h-69 rounded-[50%] bg-modus-orange overflow-hidden mx-auto lg:mx-0">
                 <img
                   src="src/image/image2.jpg"
                   alt="Model wearing green sweater"
