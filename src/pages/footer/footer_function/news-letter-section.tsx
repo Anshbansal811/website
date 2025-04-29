@@ -44,26 +44,41 @@ export const NewsLetterSection = () => {
 
         {/* Floating Images for Mobile */}
         <div className="flex flex-wrap justify-center gap-4 mt-10">
-          <div className="w-16 h-16 rounded-full overflow-hidden">
-            <img
-              src="src/image/image1.png"
-              alt="Person"
-              className="w-full h-full"
-            />
+          <div className="w-20 h-20 rounded-full bg-modus-orange flex items-center justify-center">
+            <div className="w-[78px] h-[78px] rounded-full bg-black flex items-center justify-center">
+              <div className="w-[66px] h-[66px] rounded-full overflow-hidden">
+                <img
+                  src="src/image/image1.png"
+                  alt="Person"
+                  className="w-full h-full"
+                />
+              </div>
+            </div>
           </div>
-          <div className="w-16 h-16 rounded-full overflow-hidden">
-            <img
-              src="src\image\image2.jpg"
-              alt="Person"
-              className="w-full h-full"
-            />
+
+          {/* Other simple circular avatars */}
+          <div className="w-20 h-20 rounded-full bg-modus-orange flex items-center justify-center">
+            <div className="w-[78px] h-[78px] rounded-full bg-black flex items-center justify-center">
+              <div className="w-[66px] h-[66px] rounded-full overflow-hidden">
+                <img
+                  src="src/image/image2.jpg"
+                  alt="Person"
+                  className="w-full h-full"
+                />
+              </div>
+            </div>
           </div>
-          <div className="w-16 h-16 rounded-full overflow-hidden">
-            <img
-              src="src\image\image3.png"
-              alt="Person"
-              className="w-full h-full"
-            />
+
+          <div className="w-20 h-20 rounded-full bg-modus-orange flex items-center justify-center">
+            <div className="w-[78px] h-[78px] rounded-full bg-black flex items-center justify-center">
+              <div className="w-[66px] h-[66px] rounded-full overflow-hidden">
+                <img
+                  src="src/image/image3.png"
+                  alt="Person"
+                  className="w-full h-full"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
