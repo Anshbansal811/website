@@ -1,7 +1,12 @@
-import { Homepages } from "./pages/components/homepages";
 import { Footer } from "./pages/footer/footer";
 import { Navbar } from "./pages/header/navebar";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import {
+  Homepage,
+  Shopepage,
+  Aboutpage,
+  Contactpage,
+} from "./pages/components/index";
 
 function App() {
   return (
@@ -10,7 +15,10 @@ function App() {
         <Navbar />
         <main className="flex-grow">
           <Routes>
-            <Route path="/" element={<Homepages/>} />
+            <Route path="/" element={<Homepage />} />
+            <Route path="/shop" element={<Shopepage />} />
+            <Route path="/about" element={<Aboutpage />} />
+            <Route path="/contact" element={<Contactpage />} />
           </Routes>
         </main>
         <Footer />
