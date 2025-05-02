@@ -1,42 +1,15 @@
 import { Link } from "react-router-dom";
+import image1 from "../../image/image1.png";
+import image2 from "../../image/image2.jpg";
+import image3 from "../../image/image3.png";
 
 const latestProducts = [
-  {
-    id: 1,
-    name: "Yellow Jacket",
-    category: "men",
-    image: "src/image/image1.png",
-  },
-  {
-    id: 2,
-    name: "Green Sweater",
-    category: "men",
-    image: "src/image/image2.jpg",
-  },
-  {
-    id: 3,
-    name: "Orange Jacket",
-    category: "men",
-    image: "src/image/image3.png",
-  },
-  {
-    id: 4,
-    name: "Brown Jacket",
-    category: "men",
-    image: "src/image/image1.png",
-  },
-  {
-    id: 5,
-    name: "Brown Jacket",
-    category: "men",
-    image: "src/image/image1.png",
-  },
-  {
-    id: 6,
-    name: "Brown Jacket",
-    category: "men",
-    image: "src/image/image1.png",
-  },
+  { id: 1, name: "Yellow Jacket", image: image1 },
+  { id: 2, name: "Green Sweater", image: image2 },
+  { id: 3, name: "Orange Jacket", image: image3 },
+  { id: 4, name: "Orange Jacket", image: image3 },
+  { id: 5, name: "Orange Jacket", image: image3 },
+  { id: 6, name: "Orange Jacket", image: image3 },
 ];
 
 export const Homepage = () => {
