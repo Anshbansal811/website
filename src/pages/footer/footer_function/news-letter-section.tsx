@@ -1,4 +1,7 @@
 import { useState } from "react";
+import image1 from "../../image/image1.png";
+import image2 from "../../image/image2.jpg";
+import image3 from "../../image/image3.png";
 
 export const NewsLetterSection = () => {
   const [phone, setPhone] = useState("");
@@ -47,11 +50,7 @@ export const NewsLetterSection = () => {
           <div className="w-20 h-20 rounded-full bg-modus-orange flex items-center justify-center">
             <div className="w-[78px] h-[78px] rounded-full bg-black flex items-center justify-center">
               <div className="w-[66px] h-[66px] rounded-full overflow-hidden">
-                <img
-                  src="src/image/image1.png"
-                  alt="Person"
-                  className="w-full h-full"
-                />
+                <img src={image1} alt="Person" className="w-full h-full" />
               </div>
             </div>
           </div>
@@ -61,7 +60,7 @@ export const NewsLetterSection = () => {
             <div className="w-[78px] h-[78px] rounded-full bg-black flex items-center justify-center">
               <div className="w-[66px] h-[66px] rounded-full overflow-hidden">
                 <img
-                  src="src/image/image2.jpg"
+                  src={image2}
                   alt="Person"
                   className="w-full h-full"
                 />
@@ -73,7 +72,7 @@ export const NewsLetterSection = () => {
             <div className="w-[78px] h-[78px] rounded-full bg-black flex items-center justify-center">
               <div className="w-[66px] h-[66px] rounded-full overflow-hidden">
                 <img
-                  src="src/image/image3.png"
+                  src={image3}
                   alt="Person"
                   className="w-full h-full"
                 />

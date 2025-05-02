@@ -7,8 +7,8 @@ const latestProducts = [
   { id: 1, name: "Yellow Jacket", image: image1 },
   { id: 2, name: "Green Sweater", image: image2 },
   { id: 3, name: "Orange Jacket", image: image3 },
-  { id: 4, name: "Orange Jacket", image: image3 },
-  { id: 5, name: "Orange Jacket", image: image3 },
+  { id: 4, name: "Orange Jacket", image: image1 },
+  { id: 5, name: "Orange Jacket", image: image2 },
   { id: 6, name: "Orange Jacket", image: image3 },
 ];
 
@@ -22,7 +22,7 @@ export const Homepage = () => {
             <div className="mt-10 lg:mt-0 lg:-ml-10">
               <div className="w-40 h-55 md:w-56 md:h-69 rounded-[50%] bg-modus-orange overflow-hidden mx-auto">
                 <img
-                  src="src/image/image1.png"
+                  src={image1}
                   alt="Model wearing green sweater"
                   className="w-full h-full"
                 />
@@ -54,7 +54,7 @@ export const Homepage = () => {
             <div className="mt-8 lg:mt-0 lg:absolute lg:right-0 lg:bottom-0 lg:translate-y-20">
               <div className="w-40 h-55 sm:w-40 sm:h-55 md:w-56 md:h-69 rounded-[50%] bg-modus-orange overflow-hidden mx-auto lg:mx-0">
                 <img
-                  src="src/image/image2.jpg"
+                  src={image2}
                   alt="Model wearing green sweater"
                   className="w-full h-full"
                 />
@@ -148,7 +148,7 @@ export const Homepage = () => {
                   }}
                 >
                   <img
-                    src="src/image/image1.png"
+                    src={image1}
                     alt="Model"
                     className="w-[85%] h-auto"
                   />
@@ -194,7 +194,7 @@ export const Homepage = () => {
               <div className="relative">
                 <div className="w-64 h-64 md:w-80 md:h-80 rounded-full bg-modus-orange overflow-hidden">
                   <img
-                    src="src/image/image3.png"
+                    src={image3}
                     alt="Model in yellow outfit"
                     className="w-full h-full"
                   />
