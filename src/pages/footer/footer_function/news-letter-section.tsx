@@ -22,7 +22,7 @@ export const NewsLetterSection = () => {
         <div className="max-w-2xl mx-auto text-center">
           <h3 className="text-xl mb-2">NEVER MISS A THING</h3>
           <h2 className="text-2xl font-bold mb-6">
-            share your contact number so we can reach out
+            Share your contact number so we can reach out
           </h2>
           <form
             onSubmit={handleSubmit}

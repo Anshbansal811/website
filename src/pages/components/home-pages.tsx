@@ -4,12 +4,12 @@ import image2 from "../../image/image2.jpg";
 import image3 from "../../image/image3.png"
 
 const latestProducts = [
-  { id: 1, name: "Yellow Jacket", image: image1 },
-  { id: 2, name: "Green Sweater", image: image2 },
-  { id: 3, name: "Orange Jacket", image: image3 },
-  { id: 4, name: "Orange Jacket", image: image1 },
-  { id: 5, name: "Orange Jacket", image: image2 },
-  { id: 6, name: "Orange Jacket", image: image3 },
+  { id: 1, name: "Blazer", image: image1 },
+  { id: 2, name: "Blazer", image: image2 },
+  { id: 3, name: "Sherwani", image: image3 },
+  { id: 4, name: "Blazer", image: image1 },
+  { id: 5, name: "Blazer", image: image2 },
+  { id: 6, name: "Sherwani", image: image3 },
 ];
 
 export const Homepage = () => {
@@ -92,13 +92,13 @@ export const Homepage = () => {
               {latestProducts.map((product) => (
                 <div
                   key={product.id}
-                  className="w-[45vw] sm:w-[30vw] md:w-[220px] group flex-shrink-0"
+                  className="w-[45vw] sm:w-[30vw] md:w-[220px] group flex-shrink-0 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition duration-300"
                 >
                   <div className="bg-gray-100 rounded-lg overflow-hidden relative">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-auto aspect-square"
+                      className="w-full h-full"
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button className="w-full text-center py-1">
@@ -106,7 +106,7 @@ export const Homepage = () => {
                       </button>
                     </div>
                   </div>
-                  <div className="mt-3">
+                  <div className="mt-4 text-center">
                     <h3 className="font-medium">{product.name}</h3>
                   </div>
                 </div>
@@ -127,7 +127,7 @@ export const Homepage = () => {
               <p className="text-gray-700 mb-6 text-lg">
                 Fashion is a form of self-expression and autonomy at a
                 particular period and place and in a specific context for
-                clothing, footwear, lifestyle, accessories.
+                clothing, lifestyle, accessories.
               </p>
               <Link
                 to="/about"
