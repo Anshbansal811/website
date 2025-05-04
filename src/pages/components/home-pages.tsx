@@ -1,15 +1,15 @@
 import { Link } from "react-router-dom";
 import image1 from "../../image/image1.png";
 import image2 from "../../image/image2.jpg";
-import image3 from "../../image/image3.png"
+import image3 from "../../image/image3.png";
 
 const latestProducts = [
-  { id: 1, name: "Blazer", image: image1 },
-  { id: 2, name: "Blazer", image: image2 },
-  { id: 3, name: "Sherwani", image: image3 },
-  { id: 4, name: "Blazer", image: image1 },
-  { id: 5, name: "Blazer", image: image2 },
-  { id: 6, name: "Sherwani", image: image3 },
+  { id: 1, name: "Yellow Jacket", image: image1 },
+  { id: 2, name: "Green Sweater", image: image2 },
+  { id: 3, name: "Orange Jacket", image: image3 },
+  { id: 4, name: "Orange Jacket", image: image1 },
+  { id: 5, name: "Orange Jacket", image: image2 },
+  { id: 6, name: "Orange Jacket", image: image3 },
 ];
 
 export const Homepage = () => {
@@ -95,6 +95,7 @@ export const Homepage = () => {
                   className="w-[45vw] sm:w-[30vw] md:w-[220px] group flex-shrink-0 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition duration-300"
                 >
                   <div className="bg-gray-100 rounded-lg overflow-hidden relative">
+                    {/*w-[65vw] h-[85vw] sm:w-[35vw] sm:h-[40vw] md:w-[30vw] md:h-[35vw] lg:w-[25vw] lg:h-[30vw] rounded-full bg-modus-orange overflow-hidden mx-auto lg:mx-0*/}
                     <img
                       src={product.image}
                       alt={product.name}
@@ -127,7 +128,7 @@ export const Homepage = () => {
               <p className="text-gray-700 mb-6 text-lg">
                 Fashion is a form of self-expression and autonomy at a
                 particular period and place and in a specific context for
-                clothing, lifestyle, accessories.
+                clothing, footwear, lifestyle, accessories.
               </p>
               <Link
                 to="/about"
@@ -147,11 +148,7 @@ export const Homepage = () => {
                     borderRadius: "60% 40% 30% 70% / 50% 30% 70% 50%",
                   }}
                 >
-                  <img
-                    src={image1}
-                    alt="Model"
-                    className="w-[85%] h-auto"
-                  />
+                  <img src={image1} alt="Model" className="w-[85%] h-auto" />
                 </div>
 
                 {/* Curved SVG Text */}
@@ -192,7 +189,7 @@ export const Homepage = () => {
             </div>
             <div className="lg:w-1/2">
               <div className="relative">
-                <div className="w-64 h-64 md:w-80 md:h-80 rounded-full bg-modus-orange overflow-hidden">
+                <div className="w-[65vw] h-[85vw] sm:w-[35vw] sm:h-[40vw] md:w-[30vw] md:h-[35vw] lg:w-[25vw] lg:h-[30vw] rounded-full bg-modus-orange overflow-hidden mx-auto lg:mx-0">
                   <img
                     src={image3}
                     alt="Model in yellow outfit"
