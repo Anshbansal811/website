@@ -4,12 +4,12 @@ import image2 from "../../image/image2.jpg";
 import image3 from "../../image/image3.png";
 
 const latestProducts = [
-  { id: 1, name: "Yellow Jacket", image: image1 },
-  { id: 2, name: "Green Sweater", image: image2 },
-  { id: 3, name: "Orange Jacket", image: image3 },
-  { id: 4, name: "Orange Jacket", image: image1 },
-  { id: 5, name: "Orange Jacket", image: image2 },
-  { id: 6, name: "Orange Jacket", image: image3 },
+  { id: 1, name: "Blazer", image: image1 },
+  { id: 2, name: "Blazer", image: image2 },
+  { id: 3, name: "Sherwani", image: image3 },
+  { id: 4, name: "Blazer", image: image1 },
+  { id: 5, name: "Blazer", image: image2 },
+  { id: 6, name: "Sherwani", image: image3 },
 ];
 
 export const Homepage = () => {
