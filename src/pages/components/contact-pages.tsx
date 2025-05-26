@@ -1,11 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const Contactpage = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const [formData, setFormData] = useState({
     name: "",
     phonenumber: "",
     subject: "",
     message: "",
+    state: "",
+    city: "",
+    company: "",
+    gst_pan: "",
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
 
@@ -98,19 +106,86 @@ export const Contactpage = () => {
                     </div>
                     <div>
                       <label
+                        htmlFor="Company Name"
+                        className="block text-gray-700 mb-2"
+                      >
+                        Company Name
+                      </label>
+                      <input
+                        type="text"
+                        id="company"
+                        name="company"
+                        value={formData.company}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label
                         htmlFor="phone number"
                         className="block text-gray-700 mb-2"
                       >
                         Phone Number
                       </label>
                       <input
-                        type="phonenumber"
+                        type="number"
                         id="phonenumber"
                         name="phonenumber"
                         value={formData.phonenumber}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
                         required
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="State"
+                        className="block text-gray-700 mb-2"
+                      >
+                        State
+                      </label>
+                      <input
+                        type="text"
+                        id="state"
+                        name="state"
+                        value={formData.state}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="City"
+                        className="block text-gray-700 mb-2"
+                      >
+                        City
+                      </label>
+                      <input
+                        type="text"
+                        id="city"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="GST/PAN"
+                        className="block text-gray-700 mb-2"
+                      >
+                        GST Number/ PAN Number
+                      </label>
+                      <input
+                        type="text"
+                        id="gst/pan"
+                        name="gst/pan"
+                        value={formData.gst_pan}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
                       />
                     </div>
                   </div>
@@ -169,15 +244,15 @@ export const Contactpage = () => {
               <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">Address 1</h3>
+                  {/* <h3 className="text-lg font-semibold mb-2">Address 1</h3>
                   <p className="text-gray-600">
                     39/225 Karwan Gali Lohamanid
                     <br />
                     Agra, Uttar Pradesh 282002
                     <br />
                     India
-                  </p>
-                  <h3 className="text-lg font-semibold mb-2">Address 2</h3>
+                  </p> */}
+                  <h3 className="text-lg font-semibold mb-2">Address</h3>
                   <p className="text-gray-600">
                     MIG-254 B-block Shastripuram
                     <br />
