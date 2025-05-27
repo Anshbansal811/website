@@ -174,15 +174,15 @@ export const Contactpage = () => {
                     </div>
                     <div>
                       <label
-                        htmlFor="GST/PAN"
+                        htmlFor="GST"
                         className="block text-gray-700 mb-2"
                       >
                         GST Number/ PAN Number
                       </label>
                       <input
                         type="text"
-                        id="gst/pan"
-                        name="gst/pan"
+                        id="gst"
+                        name="gst_pan"
                         value={formData.gst_pan}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
