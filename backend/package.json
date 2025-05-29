@@ -1,12 +1,12 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "dist/server.js",
+  "main": "src/server.ts",
   "engines": {
     "node": ">=18.0.0"
   },
   "scripts": {
-    "start": "ts-node dist/server.js",
+    "start": "ts-node src/server.ts",
     "dev": "ts-node src/server.ts",
     "build": "tsc",
     "migrate": "ts-node src/db/migrate.ts",
