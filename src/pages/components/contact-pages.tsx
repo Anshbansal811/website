@@ -71,15 +71,19 @@ export const Contactpage = () => {
 
     setIsSubmitting(true);
     try {
+      console.log("Submitting to:", `${API_URL}/api/contact/submit`);
       const response = await fetch(`${API_URL}/api/contact/submit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(formData),
       });
 
       const data = await response.json();
+      console.log("Response:", data);
 
       if (response.ok) {
         setFormSubmitted(true);
@@ -100,10 +104,10 @@ export const Contactpage = () => {
       console.error("Error submitting form:", error);
       if (error instanceof TypeError && error.message === "Failed to fetch") {
         setError(
-          "Cannot connect to the server. Please make sure the backend server is running."
+          "Cannot connect to the server. Please check your internet connection and try again."
         );
       } else {
-        setError("Network error. Please check your connection and try again.");
+        setError("Network error. Please try again later.");
       }
     } finally {
       setIsSubmitting(false);
