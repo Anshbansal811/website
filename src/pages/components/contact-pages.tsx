@@ -16,6 +16,10 @@ export const Contactpage = () => {
     gst_pan: "",
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   const handleChange = (e: React.ChangeEvent<Element>) => {
     const { name, value } = e.target as HTMLInputElement;
@@ -23,14 +27,87 @@ export const Contactpage = () => {
       ...prevState,
       [name]: value,
     }));
+    // Clear error when user starts typing
+    setError(null);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const validateForm = () => {
+    const requiredFields = [
+      "name",
+      "phonenumber",
+      "subject",
+      "message",
+      "state",
+      "city",
+      "company",
+    ];
+    const missingFields = requiredFields.filter(
+      (field) => !formData[field as keyof typeof formData]
+    );
+
+    if (missingFields.length > 0) {
+      setError(
+        `Please fill in all required fields: ${missingFields.join(", ")}`
+      );
+      return false;
+    }
+
+    const phoneRegex = /^[0-9]{10,15}$/;
+    if (!phoneRegex.test(formData.phonenumber)) {
+      setError("Please enter a valid phone number (10-15 digits)");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Here you would typically send the data to your backend
-    // For now, we'll just show a success message
-    setFormSubmitted(true);
+    setError(null);
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(`${API_URL}/api/contact/submit`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setFormSubmitted(true);
+        setFormData({
+          name: "",
+          phonenumber: "",
+          subject: "",
+          message: "",
+          state: "",
+          city: "",
+          company: "",
+          gst_pan: "",
+        });
+      } else {
+        setError(data.message || "Error submitting form. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      if (error instanceof TypeError && error.message === "Failed to fetch") {
+        setError(
+          "Cannot connect to the server. Please make sure the backend server is running."
+        );
+      } else {
+        setError("Network error. Please check your connection and try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -66,7 +143,7 @@ export const Contactpage = () => {
         <div className="relative container mx-auto px-4 text-center z-10">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Contact Us</h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Have feedback or questions? Reach out — we’d love to hear from you!
+            Have feedback or questions? Reach out — we'd love to hear from you!
           </p>
         </div>
       </div>
@@ -86,6 +163,11 @@ export const Contactpage = () => {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {error && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                      <p>{error}</p>
+                    </div>
+                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label
@@ -173,10 +255,7 @@ export const Contactpage = () => {
                       />
                     </div>
                     <div>
-                      <label
-                        htmlFor="GST"
-                        className="block text-gray-700 mb-2"
-                      >
+                      <label htmlFor="GST" className="block text-gray-700 mb-2">
                         GST Number/ PAN Number
                       </label>
                       <input
@@ -232,8 +311,12 @@ export const Contactpage = () => {
                     ></textarea>
                   </div>
 
-                  <button type="submit" className="btn btn-primary py-3 px-8">
-                    Send Message
+                  <button
+                    type="submit"
+                    className="btn btn-primary py-3 px-8"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Sending..." : "Send Message"}
                   </button>
                 </form>
               )}
