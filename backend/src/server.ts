@@ -10,11 +10,7 @@ const port = process.env.PORT || 5000;
 
 // CORS configuration remove if ot work in site
 const allowedOrigins = [
-  "https://website-nmwr-git-main-anshbansal811s-projects.vercel.app",
-  "https://website-nmwr-git-database-connect-anshbansal811s-projects.vercel.app",
-  "https://website-nmwr-3oxs629cc-anshbansal811s-projects.vercel.app",
   "http://localhost:5173", // Keep local development working
-  "https://*.vercel.app", // Allow all Vercel preview deployments
 ];
 
 app.use(

@@ -103,9 +103,7 @@ export const Contactpage = () => {
     } catch (error) {
       console.error("Error submitting form:", error);
       if (error instanceof TypeError && error.message === "Failed to fetch") {
-        setError(
-          "Cannot connect to the server. Please check your internet connection and try again."
-        );
+        setError("");
       } else {
         setError("Network error. Please try again later.");
       }
