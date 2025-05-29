@@ -6,7 +6,7 @@
     "start": "node dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc && npm run copy-files",
-    "copy-files": "cp package.json dist/",
+    "copy-files": "copy package.json dist\\",
     "migrate": "ts-node src/db/migrate.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
