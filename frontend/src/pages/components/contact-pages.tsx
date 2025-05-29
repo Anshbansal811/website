@@ -19,7 +19,8 @@ export const Contactpage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  //const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = "https://website-lks4.onrender.com";
 
   const handleChange = (e: React.ChangeEvent<Element>) => {
     const { name, value } = e.target as HTMLInputElement;
