@@ -16,7 +16,6 @@ export const createUsers = async (
 ) => {
   const { name, phonenumber, subject, message, state, city, company, gst_pan } =
     submission;
-    console.log("Received submission:", name, phonenumber, subject, message, state, city, company, gst_pan);
 
   const query = `
     INSERT INTO Users 

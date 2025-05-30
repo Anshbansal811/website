@@ -2,11 +2,22 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import contactRoutes from "./routes/contact.routes";
+import pool from "./config/db";
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
+
+// Test database connection
+pool
+  .connect()
+  .then(() => {
+    console.log("Database connected successfully");
+  })
+  .catch((err) => {
+    console.error("Database connection error:", err);
+  });
 
 // CORS configuration remove if ot work in site
 const allowedOrigins = [
