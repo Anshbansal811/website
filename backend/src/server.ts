@@ -21,7 +21,8 @@ pool
 
 // CORS configuration remove if ot work in site
 const allowedOrigins = [
-  "https://frontend1-t6n0.onrender.com"
+  //"https://frontend1-t6n0.onrender.com"
+  "https://website-s8k2.vercel.app/"
   //"http://localhost:5173", // Keep local development working
 ].filter(Boolean); // Remove any undefined values
 
