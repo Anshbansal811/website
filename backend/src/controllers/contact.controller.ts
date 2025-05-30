@@ -7,6 +7,7 @@ import {
 export const submitContactForm = async (req: Request, res: Response) => {
   try {
     const submission: ContactUsers = req.body;
+    console.log("Received submission:", submission);
 
     // Validate required fields
     const requiredFields = [
