@@ -21,8 +21,7 @@ export const Contactpage = () => {
 
   //const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
   
-  //const API_URL = "https://website-c0fw.onrender.com";
-  const API_URL = "https://website-iota-lilac.vercel.app";
+  const API_URL = "https://website-c0fw.onrender.com";
 
   const handleChange = (e: React.ChangeEvent<Element>) => {
     const { name, value } = e.target as HTMLInputElement;
