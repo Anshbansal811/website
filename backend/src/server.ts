@@ -2,7 +2,9 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import contactRoutes from "./routes/contact.routes";
+import authRoutes from "./routes/auth.routes";
 import pool from "./config/db";
+import "./config/mongodb";
 
 dotenv.config();
 
@@ -13,22 +15,21 @@ const port = process.env.PORT || 5000;
 pool
   .connect()
   .then(() => {
-    console.log("Database connected successfully");
+    console.log("PostgreSQL Database connected successfully");
   })
   .catch((err) => {
-    console.error("Database connection error:", err);
+    console.error("PostgreSQL Database connection error:", err);
   });
 
-// CORS configuration remove if ot work in site
+// CORS configuration
 const allowedOrigins = [
-  "https://frontend1-t6n0.onrender.com"
-  //"http://localhost:5173", // Keep local development working
-].filter(Boolean); // Remove any undefined values
+  //"https://frontend1-t6n0.onrender.com",
+  "http://localhost:5173", // Keep local development working
+].filter(Boolean);
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) {
         return callback(null, true);
       }
@@ -47,11 +48,11 @@ app.use(
 );
 
 // Middleware
-//app.use(cors());
 app.use(express.json());
 
 // Routes
 app.use("/api/contact", contactRoutes);
+app.use("/api/auth", authRoutes);
 
 // Health check endpoint
 app.get("/health", (req, res) => {

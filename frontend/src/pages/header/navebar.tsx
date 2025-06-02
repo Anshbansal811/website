@@ -1,17 +1,24 @@
+import { useAuth } from "../../contexts/AuthContext";
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export const Navbar = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
 
-   useEffect(() => {
+  useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname]);
+
+  const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <header className="bg-gray shadow-lg">
@@ -38,6 +45,38 @@ export const Navbar = () => {
               <Link to="/contact" className="text-gray-700 hover:text-gray-900">
                 Contact
               </Link>
+              {isAuthenticated ? (
+                <>
+                  <span className="text-gray-700">Welcome, {user?.name}</span>
+                  <Link
+                    to="/dashboard"
+                    className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </nav>
             <div className="ml-6 flex items-center space-x-4">
               <button
@@ -109,6 +148,40 @@ export const Navbar = () => {
               >
                 Contact
               </Link>
+              {isAuthenticated ? (
+                <>
+                  <span className="block text-gray-700">
+                    Welcome, {user?.name}
+                  </span>
+                  <Link
+                    to="/dashboard"
+                    className="block text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 mt-2"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="block text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="block bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 mt-2"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </nav>
           </div>
         )}
