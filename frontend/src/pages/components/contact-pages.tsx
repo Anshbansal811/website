@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 export const Contactpage = () => {
   useEffect(() => {
@@ -20,7 +21,7 @@ export const Contactpage = () => {
   const [error, setError] = useState<string | null>(null);
 
   //const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-  
+
   const API_URL = "https://website-c0fw.onrender.com";
 
   const handleChange = (e: React.ChangeEvent<Element>) => {
@@ -74,20 +75,21 @@ export const Contactpage = () => {
     setIsSubmitting(true);
     try {
       console.log("Submitting to:", `${API_URL}/api/contact/submit`);
-      const response = await fetch(`${API_URL}/api/contact/submit`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(formData),
-      });
+      const response = await axios.post(
+        `${API_URL}/api/contact/submit`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
 
-      const data = await response.json();
-      console.log("Response:", data);
+      console.log("Response:", response.data);
 
-      if (response.ok) {
+      if (response.status === 200) {
         setFormSubmitted(true);
         setFormData({
           name: "",
@@ -100,12 +102,17 @@ export const Contactpage = () => {
           gst_pan: "",
         });
       } else {
-        setError(data.message || "Error submitting form. Please try again.");
+        setError(
+          response.data.message || "Error submitting form. Please try again."
+        );
       }
     } catch (error) {
       console.error("Error submitting form:", error);
-      if (error instanceof TypeError && error.message === "Failed to fetch") {
-        setError("");
+      if (axios.isAxiosError(error)) {
+        setError(
+          error.response?.data?.message ||
+            "Network error. Please try again later."
+        );
       } else {
         setError("Network error. Please try again later.");
       }
