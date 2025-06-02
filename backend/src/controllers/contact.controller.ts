@@ -1,8 +1,5 @@
 import { Request, Response } from "express";
-import {
-  createUsers,
-  ContactUsers,
-} from "../models/contact-model";
+import { createUsers, ContactUsers } from "../models/contact-model";
 
 export const submitContactForm = async (req: Request, res: Response) => {
   try {
@@ -40,7 +37,8 @@ export const submitContactForm = async (req: Request, res: Response) => {
 
     const result = await createUsers(submission);
 
-    res.status(201).json({
+    // Use status 200 for successful form submission to match frontend expectations
+    res.status(200).json({
       success: true,
       data: result,
       message: "Contact form submitted successfully",

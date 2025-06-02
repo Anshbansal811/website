@@ -89,7 +89,7 @@ export const Contactpage = () => {
 
       console.log("Response:", response.data);
 
-      if (response.status === 200) {
+      if (response.data.success === true) {
         setFormSubmitted(true);
         setFormData({
           name: "",
