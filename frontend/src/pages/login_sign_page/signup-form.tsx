@@ -10,8 +10,9 @@ export const SignupForm = () => {
     email: "",
     password: "",
     name: "",
-    role: UserRole.RETAILER,
+    role: "" as UserRole | "",
     company: "",
+    phonenumber: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,7 +23,7 @@ export const SignupForm = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: name === "role" && value !== "" ? (value as UserRole) : value,
     }));
   };
 
@@ -32,8 +33,13 @@ export const SignupForm = () => {
     setLoading(true);
 
     try {
-      await signup(formData);
-      navigate("/dashboard");
+      if (formData.role === "") {
+        setError("Please select a role.");
+        setLoading(false);
+        return;
+      }
+      await signup({ ...formData, role: formData.role as UserRole });
+      navigate("/login");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to sign up");
     } finally {
@@ -95,6 +101,27 @@ export const SignupForm = () => {
 
             <div>
               <label
+                htmlFor="phonenumber"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Mobile Number
+              </label>
+              <div className="mt-1">
+                <input
+                  id="phonenumber"
+                  name="phonenumber"
+                  type="phonenumber"
+                  autoComplete="phonenumber"
+                  required
+                  value={formData.phonenumber}
+                  onChange={handleChange}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-700"
               >
@@ -122,7 +149,7 @@ export const SignupForm = () => {
               >
                 Role
               </label>
-              <div className="mt-1">
+              <div className="relative mt-1">
                 <select
                   id="role"
                   name="role"
@@ -131,10 +158,29 @@ export const SignupForm = () => {
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 >
+                  <option value="" disabled>
+                    Select a role
+                  </option>
                   <option value={UserRole.RETAILER}>Retailer</option>
                   <option value={UserRole.CORPORATE}>Corporate</option>
                   <option value={UserRole.SELLER}>Seller</option>
                 </select>
+                {/* Down arrow icon (SVG) */}
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 ">
+                  <svg
+                    className="h-4 w-4 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.66a.75.75 0 01-1.08 0l-4.25-4.66a.75.75 0 01.02-1.06z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
 

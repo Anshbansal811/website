@@ -13,6 +13,7 @@ export interface IUser extends mongoose.Document {
   role: UserRole;
   name: string;
   company?: string;
+  phonenumber: string;
   createdAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
@@ -38,6 +39,12 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+  },
+  phonenumber: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
   },
   company: {
     type: String,

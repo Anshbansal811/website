@@ -2,29 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { UserRole } from "../types/auth";
 import api from "../utils/axios";
 import axios from "axios";
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: UserRole;
-  company?: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (userData: {
-    email: string;
-    password: string;
-    name: string;
-    role: UserRole;
-    company?: string;
-  }) => Promise<void>;
-  logout: () => void;
-}
+import { User, AuthContextType } from "../types/auth";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -72,6 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     name: string;
     role: UserRole;
     company?: string;
+    phonenumber: string;
   }) => {
     try {
       // Validate required fields
@@ -79,6 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         !userData.email ||
         !userData.password ||
         !userData.name ||
+        !userData.phonenumber ||
         !userData.role
       ) {
         throw new Error("All fields are required");

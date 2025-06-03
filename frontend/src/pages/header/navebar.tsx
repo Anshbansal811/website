@@ -47,10 +47,9 @@ export const Navbar = () => {
               </Link>
               {isAuthenticated ? (
                 <>
-                  <span className="text-gray-700">Welcome, {user?.name}</span>
                   <Link
                     to="/dashboard"
-                    className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
+                    className="text-gray-700 hover:text-gray-900"
                   >
                     Dashboard
                   </Link>
@@ -65,7 +64,7 @@ export const Navbar = () => {
                 <>
                   <Link
                     to="/login"
-                    className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
+                    className="text-gray-700 hover:text-gray-900"
                   >
                     Login
                   </Link>
@@ -150,12 +149,9 @@ export const Navbar = () => {
               </Link>
               {isAuthenticated ? (
                 <>
-                  <span className="block text-gray-700">
-                    Welcome, {user?.name}
-                  </span>
                   <Link
                     to="/dashboard"
-                    className="block text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
+                    className="block text-gray-700 hover:text-gray-900"
                   >
                     Dashboard
                   </Link>
@@ -170,7 +166,7 @@ export const Navbar = () => {
                 <>
                   <Link
                     to="/login"
-                    className="block text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
+                    className="block text-gray-700 hover:text-gray-900"
                   >
                     Login
                   </Link>

@@ -6,7 +6,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
 export const signup = async (req: Request, res: Response) => {
   try {
-    const { email, password, name, role, company } = req.body;
+    const { email, password, name, role, company, phonenumber } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -20,6 +20,7 @@ export const signup = async (req: Request, res: Response) => {
       password,
       name,
       role,
+      phonenumber,
       company:
         role === UserRole.CORPORATE || role === UserRole.SELLER
           ? company
@@ -42,6 +43,7 @@ export const signup = async (req: Request, res: Response) => {
         name: user.name,
         role: user.role,
         company: user.company,
+        phonenumber: user.phonenumber,
       },
     });
   } catch (error: any) {
