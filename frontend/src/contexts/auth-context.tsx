@@ -16,7 +16,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const token = localStorage.getItem("token");
     if (token) {
       api
-        .get("/api/auth/me")
+        .get("/auth/me")
         .then(({ data }) => {
           setUser(data.user);
         })
@@ -33,7 +33,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const login = async (email: string, password: string) => {
     try {
-      const { data } = await api.post("/api/auth/login", { email, password });
+      console.log("Sending signup request with data:");
+      const { data } = await api.post("/auth/login", { email, password });
       localStorage.setItem("token", data.token);
       setUser(data.user);
     } catch (error) {
@@ -92,7 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       console.log("Sending signup request with data:", userData);
-      const { data } = await api.post("/api/auth/signup", userData);
+      const { data } = await api.post("/auth/signup", userData);
       localStorage.setItem("token", data.token);
       setUser(data.user);
     } catch (error) {
