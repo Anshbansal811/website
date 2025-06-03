@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../contexts/auth-context";
 import { UserRole } from "../../types/auth";
 import api from "../../utils/axios";
 
@@ -156,4 +156,3 @@ export const Dashboard = () => {
     </div>
   );
 };
-
