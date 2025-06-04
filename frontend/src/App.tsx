@@ -19,6 +19,8 @@ import {
 } from "./pages/login_sign_page/index";
 import { Navbar } from "./pages/header/navebar";
 import { Footer } from "./pages/footer/footer";
+import { ContactsPage } from "./pages/contact/contact-page";
+import { UploadPage } from "./pages/upload_image/upload-page";
 
 const App: React.FC = () => {
   return (
@@ -46,7 +48,27 @@ const App: React.FC = () => {
                 }
               />
 
-              {/* Role-specific routes */}
+              {/* Dashboard Sub-routes (can be used for direct access if needed, but mainly controlled by Dashboard state) */}
+              <Route
+                path="/dashboard/contacts"
+                element={
+                  <ProtectedRoute>
+                    {/* Render contacts content directly or pass to a layout component */}
+                    <ContactsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/upload"
+                element={
+                  <ProtectedRoute>
+                    {/* Render upload content directly or pass to a layout component */}
+                    <UploadPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Role-specific routes (Consider removing or redirecting if Dashboard handles all role views) */}
               <Route
                 path="/retailer-dashboard"
                 element={

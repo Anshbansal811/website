@@ -12,6 +12,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Function to check if current user can access another user's data
+  const canAccessUserData = (targetUserId: string): boolean => {
+    if (!user) return false;
+
+    // If user is trying to access their own data, allow it
+    if (user.id === targetUserId) return true;
+
+    // RETAILER and CORPORATE users can only access their own data
+    if (user.role === UserRole.RETAILER || user.role === UserRole.CORPORATE) {
+      return user.id === targetUserId;
+    }
+
+    // SELLER can access all data (assuming they have admin privileges)
+    return user.role === UserRole.SELLER;
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -125,7 +141,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, isAuthenticated, login, signup, logout }}
+      value={{
+        user,
+        loading,
+        isAuthenticated,
+        login,
+        signup,
+        logout,
+        canAccessUserData,
+      }}
     >
       {children}
     </AuthContext.Provider>

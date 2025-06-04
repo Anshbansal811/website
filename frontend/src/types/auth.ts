@@ -37,6 +37,7 @@ export interface AuthContextType {
     phonenumber: string;
   }) => Promise<void>;
   logout: () => void;
+  canAccessUserData: (targetUserId: string) => boolean;
 }
 
 export interface Contact {
