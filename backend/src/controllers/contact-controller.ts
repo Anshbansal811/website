@@ -15,16 +15,6 @@ export const submitContactForm = async (req: Request, res: Response) => {
       "city",
       "company",
     ];
-    const missingFields = requiredFields.filter(
-      (field) => !submission[field as keyof ContactUsers]
-    );
-
-    if (missingFields.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: `Missing required fields: ${missingFields.join(", ")}`,
-      });
-    }
 
     // Validate phone number format (basic validation)
     const phoneRegex = /^[0-9]{10,15}$/;
