@@ -38,7 +38,7 @@ export const Dashboard = () => {
   };
   return (
     <div className="flex flex-row">
-      <SidePanel />
+      {user?.role === UserRole.SELLER && <SidePanel />}
       <div className="py-2 w-64 flex-1">{renderMainContent()}</div>
     </div>
   );

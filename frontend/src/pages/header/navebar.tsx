@@ -22,7 +22,7 @@ export const Navbar = () => {
 
   return (
     <header className="bg-gray shadow-lg">
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-2 py-4">
         <div className="flex justify-between items-center">
           <Link to="/" className="text-2xl font-bold text-dark">
             <span className="text-modus-orange">W</span>e{" "}
