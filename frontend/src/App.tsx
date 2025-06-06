@@ -11,7 +11,7 @@ import {
   Contactpage,
   Dashboard,
   Unauthorized,
-} from "./pages/components/index";
+} from "./pages/components/all_main_pages/index";
 import {
   LoginForm,
   ProtectedRoute,
@@ -48,12 +48,10 @@ const App: React.FC = () => {
                 }
               />
 
-              {/* Dashboard Sub-routes (can be used for direct access if needed, but mainly controlled by Dashboard state) */}
               <Route
                 path="/dashboard/contacts"
                 element={
                   <ProtectedRoute>
-                    {/* Render contacts content directly or pass to a layout component */}
                     <ContactsPage />
                   </ProtectedRoute>
                 }
