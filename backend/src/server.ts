@@ -3,8 +3,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 import contactRoutes from "./routes/contact-routes";
 import authRoutes from "./routes/auth-routes";
+import productRoutes from "./routes/product-routes";
 import pool from "./config/db";
 import "./config/mongodb";
+import path from "path";
 
 dotenv.config();
 
@@ -23,8 +25,8 @@ pool
 
 // CORS configuration
 const allowedOrigins = [
-  "https://frontend1-t6n0.onrender.com",
-  //"http://localhost:5173", // Keep local development working
+  //"https://frontend1-t6n0.onrender.com",
+  "http://localhost:5173", // Keep local development working
 ].filter(Boolean);
 
 app.use(
@@ -50,9 +52,13 @@ app.use(
 // Middleware
 app.use(express.json());
 
+// Serve uploaded files
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+
 // Routes
 app.use("/api/contact", contactRoutes); // postgreSQL
 app.use("/api/auth", authRoutes); // MongoDB
+app.use("/api/products", productRoutes); // Product routes
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

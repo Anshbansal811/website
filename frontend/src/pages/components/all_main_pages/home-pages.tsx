@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import image1 from "../../image/image1.png";
-import image2 from "../../image/image2.jpg";
-import image3 from "../../image/image3.png";
+import image1 from "../../../image/image1.png";
+import image2 from "../../../image/image2.jpg";
+import image3 from "../../../image/image3.png";
 
 const latestProducts = [
   { id: 1, name: "Blazer", image: image1 },
