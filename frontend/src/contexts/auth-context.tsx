@@ -67,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     name: string;
     role: UserRole;
     company?: string;
-    phonenumber: string;
+    phonenumber: String;
   }) => {
     try {
       // Validate required fields

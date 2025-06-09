@@ -38,6 +38,13 @@ export const SignupForm = () => {
         setLoading(false);
         return;
       }
+
+      if (!/^\d{10}$/.test(formData.phonenumber)) {
+        setError("Phone number must be numeric and at least 10 digits");
+        setLoading(false);
+        return;
+      }
+      
       await signup({ ...formData, role: formData.role as UserRole });
       navigate("/login");
     } catch (err) {
@@ -110,7 +117,7 @@ export const SignupForm = () => {
                 <input
                   id="phonenumber"
                   name="phonenumber"
-                  type="phonenumber"
+                  type="tel"
                   autoComplete="phonenumber"
                   required
                   value={formData.phonenumber}

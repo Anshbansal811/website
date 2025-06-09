@@ -34,7 +34,7 @@ export interface AuthContextType {
     name: string;
     role: UserRole;
     company?: string;
-    phonenumber: string;
+    phonenumber: String;
   }) => Promise<void>;
   logout: () => void;
   canAccessUserData: (targetUserId: string) => boolean;

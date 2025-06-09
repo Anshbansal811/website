@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+/*import { Request, Response } from "express";
 import { Product } from "../models/product-model";
 import { ProductVariation } from "../models/product-variation-model";
 import { ProductImage } from "../models/product-image-model";
@@ -280,3 +280,4 @@ export const getExistingProducts = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to fetch existing products" });
   }
 };
+*/

@@ -1,4 +1,4 @@
-import express from "express";
+/*import express from "express";
 import multer from "multer";
 import {
   uploadProduct,
@@ -46,4 +46,4 @@ router.get("/", getProducts);
 router.get("/existing", getExistingProducts);
 router.get("/:id", getProductById);
 
-export default router;
+export default router;*/

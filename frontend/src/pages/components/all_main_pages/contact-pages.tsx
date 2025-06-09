@@ -35,15 +35,6 @@ export const Contactpage = () => {
   };
 
   const validateForm = () => {
-    const requiredFields = [
-      "name",
-      "phonenumber",
-      "subject",
-      "message",
-      "state",
-      "city",
-      "company",
-    ];
 
     const phoneRegex = /^[0-9]{10,15}$/;
     if (!phoneRegex.test(formData.phonenumber)) {

@@ -37,21 +37,20 @@ export const LoginForm = () => {
             </div>
           )}
           <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email" className="sr-only">
+            <label>
+              <div className="text-gray-700 after:ml-0.5 after:text-red-500 after:content-['*'] ...">
                 Email address
-              </label>
+              </div>
               <input
-                id="email"
-                name="email"
                 type="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
+                name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email address"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
               />
-            </div>
+            </label>
             <div>
               <label htmlFor="password" className="sr-only">
                 Password

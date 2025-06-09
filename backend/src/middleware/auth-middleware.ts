@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+/*import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { UserRole } from "../models/user-model";
 
@@ -36,3 +36,4 @@ export const authenticate = async (
     res.status(401).json({ message: "Invalid token" });
   }
 };
+*/
