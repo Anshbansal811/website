@@ -11,6 +11,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Function to check if current user can access another user's data
   const canAccessUserData = (targetUserId: string): boolean => {
@@ -28,16 +29,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return user.role === UserRole.SELLER;
   };
 
+  // Function to set auth token in axios headers
+  const setAuthToken = (token: string | null) => {
+    if (token) {
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      localStorage.setItem("token", token);
+    } else {
+      delete api.defaults.headers.common["Authorization"];
+      localStorage.removeItem("token");
+    }
+  };
+
+  // Load user data on mount
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
+      setAuthToken(token);
       api
         .get("/auth/me")
         .then(({ data }) => {
           setUser(data.user);
+          setError(null);
         })
-        .catch(() => {
-          localStorage.removeItem("token");
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+          setError("Session expired. Please login again.");
+          setAuthToken(null);
+          setUser(null);
         })
         .finally(() => {
           setLoading(false);
@@ -49,15 +67,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const login = async (email: string, password: string) => {
     try {
-      console.log("Sending signup request with data:");
+      setError(null);
       const { data } = await api.post("/auth/login", { email, password });
-      localStorage.setItem("token", data.token);
+      setAuthToken(data.token);
       setUser(data.user);
+      return data;
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        throw new Error(error.response.data.message || "Invalid credentials");
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          const message = error.response.data.message || "Invalid credentials";
+          setError(message);
+          throw new Error(message);
+        } else if (error.request) {
+          setError("No response from server");
+          throw new Error("No response from server");
+        }
       }
-      throw new Error("Invalid credentials");
+      setError("An unexpected error occurred");
+      throw new Error("An unexpected error occurred");
     }
   };
 
@@ -67,9 +94,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     name: string;
     role: UserRole;
     company?: string;
-    phonenumber: String;
+    phonenumber: string;
   }) => {
     try {
+      setError(null);
+
       // Validate required fields
       if (
         !userData.email ||
@@ -87,9 +116,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         throw new Error("Invalid email format");
       }
 
-      // Validate password length
+      // Validate password requirements
       if (userData.password.length < 6) {
         throw new Error("Password must be at least 6 characters long");
+      }
+
+      // Validate phone number
+      if (!/^\d{10}$/.test(userData.phonenumber)) {
+        throw new Error("Phone number must be exactly 10 digits");
       }
 
       // Validate role
@@ -108,33 +142,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         );
       }
 
-      console.log("Sending signup request with data:", userData);
       const { data } = await api.post("/auth/signup", userData);
-      localStorage.setItem("token", data.token);
-      setUser(data.user);
+      // Don't set auth token or user state on signup
+      // Let the user login explicitly
+      return data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response) {
-          console.error("Signup error response:", error.response.data);
-          throw new Error(error.response.data.message || "Failed to sign up");
+          const message = error.response.data.message || "Failed to sign up";
+          setError(message);
+          throw new Error(message);
         } else if (error.request) {
-          console.error("Signup error request:", error.request);
+          setError("No response from server");
           throw new Error("No response from server");
-        } else {
-          console.error("Signup error:", error.message);
-          throw new Error(error.message);
         }
       }
       if (error instanceof Error) {
+        setError(error.message);
         throw error;
       }
-      throw new Error("Failed to sign up");
+      setError("An unexpected error occurred");
+      throw new Error("An unexpected error occurred");
     }
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    setAuthToken(null);
     setUser(null);
+    setError(null);
   };
 
   const isAuthenticated = !!user;
@@ -144,6 +179,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         user,
         loading,
+        error,
         isAuthenticated,
         login,
         signup,

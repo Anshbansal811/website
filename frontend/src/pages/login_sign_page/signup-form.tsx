@@ -16,6 +16,7 @@ export const SignupForm = () => {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -31,6 +32,7 @@ export const SignupForm = () => {
     e.preventDefault();
     setError("");
     setLoading(true);
+    setSuccess(false);
 
     try {
       if (formData.role === "") {
@@ -40,13 +42,21 @@ export const SignupForm = () => {
       }
 
       if (!/^\d{10}$/.test(formData.phonenumber)) {
-        setError("Phone number must be numeric and at least 10 digits");
+        setError("Phone number must be exactly 10 digits");
         setLoading(false);
         return;
       }
-      
+
       await signup({ ...formData, role: formData.role as UserRole });
-      navigate("/login");
+      setSuccess(true);
+      // Show success message and redirect after a short delay
+      setTimeout(() => {
+        navigate("/login", {
+          state: {
+            message: "Signup successful! Please login with your credentials.",
+          },
+        });
+      }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to sign up");
     } finally {
@@ -81,6 +91,7 @@ export const SignupForm = () => {
                   value={formData.name}
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  placeholder="Enter your full name"
                 />
               </div>
             </div>
@@ -102,6 +113,7 @@ export const SignupForm = () => {
                   value={formData.email}
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  placeholder="Enter your email"
                 />
               </div>
             </div>
@@ -118,11 +130,13 @@ export const SignupForm = () => {
                   id="phonenumber"
                   name="phonenumber"
                   type="tel"
-                  autoComplete="phonenumber"
+                  autoComplete="tel"
                   required
                   value={formData.phonenumber}
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  placeholder="Enter 10-digit mobile number"
+                  maxLength={10}
                 />
               </div>
             </div>
@@ -145,6 +159,7 @@ export const SignupForm = () => {
                   value={formData.password}
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  placeholder="Enter password"
                 />
               </div>
             </div>
@@ -172,8 +187,7 @@ export const SignupForm = () => {
                   <option value={UserRole.CORPORATE}>Corporate</option>
                   <option value={UserRole.SELLER}>Seller</option>
                 </select>
-                {/* Down arrow icon (SVG) */}
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 ">
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                   <svg
                     className="h-4 w-4 text-gray-400"
                     xmlns="http://www.w3.org/2000/svg"
@@ -209,6 +223,7 @@ export const SignupForm = () => {
                     value={formData.company}
                     onChange={handleChange}
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    placeholder="Enter company name"
                   />
                 </div>
               </div>
@@ -226,13 +241,25 @@ export const SignupForm = () => {
               </div>
             )}
 
+            {success && (
+              <div className="rounded-md bg-green-50 p-4">
+                <div className="flex">
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-green-800">
+                      Signup successful! Redirecting to login...
+                    </h3>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || success}
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
               >
-                {loading ? "Signing up..." : "Sign up"}
+                {loading ? "Signing up..." : success ? "Success!" : "Sign up"}
               </button>
             </div>
           </form>

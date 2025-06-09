@@ -1,12 +1,11 @@
-/*import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { UserRole } from "../models/user-model";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
 interface JwtPayload {
   userId: string;
-  role: UserRole;
+  role: string;
 }
 
 declare global {
@@ -36,4 +35,3 @@ export const authenticate = async (
     res.status(401).json({ message: "Invalid token" });
   }
 };
-*/

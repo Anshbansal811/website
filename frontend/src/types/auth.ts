@@ -1,7 +1,7 @@
 export enum UserRole {
-  RETAILER = "retailer",
-  CORPORATE = "corporate",
-  SELLER = "seller",
+  RETAILER = "RETAILER",
+  CORPORATE = "CORPORATE",
+  SELLER = "SELLER",
 }
 
 export interface User {
@@ -10,6 +10,7 @@ export interface User {
   name: string;
   role: UserRole;
   company?: string;
+  phonenumber: string;
 }
 
 export interface LoginCredentials {
@@ -26,16 +27,17 @@ export interface SignupData extends LoginCredentials {
 export interface AuthContextType {
   user: User | null;
   loading: boolean;
+  error: string | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<any>;
   signup: (userData: {
     email: string;
     password: string;
     name: string;
     role: UserRole;
     company?: string;
-    phonenumber: String;
-  }) => Promise<void>;
+    phonenumber: string;
+  }) => Promise<any>;
   logout: () => void;
   canAccessUserData: (targetUserId: string) => boolean;
 }
