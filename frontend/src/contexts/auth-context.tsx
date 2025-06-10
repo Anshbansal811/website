@@ -13,6 +13,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Function to clear error
+  const clearError = () => {
+    setError(null);
+  };
+
   // Function to check if current user can access another user's data
   const canAccessUserData = (targetUserId: string): boolean => {
     if (!user) return false;
@@ -40,51 +45,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  // Load user data on mount
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      setAuthToken(token);
-      api
-        .get("/auth/me")
-        .then(({ data }) => {
-          setUser(data.user);
-          setError(null);
-        })
-        .catch((error) => {
-          console.error("Error fetching user data:", error);
-          setError("Session expired. Please login again.");
-          setAuthToken(null);
-          setUser(null);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
-    }
-  }, []);
-
   const login = async (email: string, password: string) => {
+    
     try {
-      setError(null);
+      setLoading(true);
+      
       const { data } = await api.post("/auth/login", { email, password });
       setAuthToken(data.token);
       setUser(data.user);
       return data;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        if (error.response) {
-          const message = error.response.data.message || "Invalid credentials";
-          setError(message);
-          throw new Error(message);
-        } else if (error.request) {
-          setError("No response from server");
-          throw new Error("No response from server");
+    } catch (loginError) {
+      console.log("cdzcdcds")
+      let errorMessage = "An unexpected error occurred";
+      
+      if (axios.isAxiosError(loginError)) {
+        if (loginError.response) {
+          errorMessage = loginError.response.data.message || "Invalid credentials";
+        } else if (loginError.request) {
+          errorMessage = "No response from server. Please check your connection.";
         }
       }
-      setError("An unexpected error occurred");
-      throw new Error("An unexpected error occurred");
+      
+      // Keep the error visible - don't clear it between attempts
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -97,7 +83,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     phonenumber: string;
   }) => {
     try {
-      setError(null);
+      // Don't clear error immediately - let it show until success or manual clear
+      setLoading(true);
 
       // Validate required fields
       if (
@@ -143,26 +130,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       const { data } = await api.post("/auth/signup", userData);
+      setError(null); // Only clear error on successful signup
       // Don't set auth token or user state on signup
       // Let the user login explicitly
       return data;
     } catch (error) {
+      let errorMessage = "An unexpected error occurred";
+      
       if (axios.isAxiosError(error)) {
         if (error.response) {
-          const message = error.response.data.message || "Failed to sign up";
-          setError(message);
-          throw new Error(message);
+          errorMessage = error.response.data.message || "Failed to sign up";
         } else if (error.request) {
-          setError("No response from server");
-          throw new Error("No response from server");
+          errorMessage = "No response from server. Please check your connection.";
         }
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
       }
-      if (error instanceof Error) {
-        setError(error.message);
-        throw error;
-      }
-      setError("An unexpected error occurred");
-      throw new Error("An unexpected error occurred");
+      
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -185,6 +173,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         signup,
         logout,
         canAccessUserData,
+        clearError,
       }}
     >
       {children}

@@ -112,7 +112,8 @@ export const login = async (req: Request, res: Response) => {
       }
     );
 
-    res.json({
+    res.status(200).json({
+      success: true,
       token,
       user: {
         id: user.id,
@@ -122,9 +123,9 @@ export const login = async (req: Request, res: Response) => {
         company: user.company,
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({success: false, message: error});
   }
 };
 
@@ -143,7 +144,8 @@ export const getMe = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.json({
+    res.status(200).json({
+      success: true,
       user: {
         id: user.id,
         email: user.email,
@@ -152,8 +154,8 @@ export const getMe = async (req: Request, res: Response) => {
         company: user.company,
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("GetMe error:", error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false,message: error });
   }
 };

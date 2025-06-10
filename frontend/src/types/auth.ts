@@ -40,6 +40,7 @@ export interface AuthContextType {
   }) => Promise<any>;
   logout: () => void;
   canAccessUserData: (targetUserId: string) => boolean;
+  clearError: () => void; // Add this line
 }
 
 export interface Contact {

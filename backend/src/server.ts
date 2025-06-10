@@ -56,8 +56,8 @@ app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // Routes
-app.use("/api/contact", contactRoutes); // postgreSQL
-app.use("/api/auth", authRoutes); // MongoDB
+app.use("/api/contact", contactRoutes); 
+app.use("/api/auth", authRoutes); 
 //app.use("/api/products", productRoutes); // Product routes
 
 // Error middleware comes last
