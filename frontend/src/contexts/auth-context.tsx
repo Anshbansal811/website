@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { UserRole } from "../types/auth";
+import { UserRole } from "../types/types";
 import api from "../utils/axios";
 import axios from "axios";
-import { User, AuthContextType } from "../types/auth";
+import { User, AuthContextType } from "../types/types";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -12,6 +12,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (token) {
+          setAuthToken(token);
+          // Validate token and fetch user data
+          const { data } = await api.get("/auth/me");
+          setUser(data.user);
+        }
+      } catch (err) {
+        console.error("Failed to load user from token:", err);
+        setAuthToken(null); // Clear invalid token
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUser();
+  }, []); // Run only once on mount
 
   // Function to clear error
   const clearError = () => {
@@ -46,26 +68,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const login = async (email: string, password: string) => {
-    
     try {
       setLoading(true);
-      
+
       const { data } = await api.post("/auth/login", { email, password });
       setAuthToken(data.token);
       setUser(data.user);
       return data;
     } catch (loginError) {
-      console.log("cdzcdcds")
+      console.log("cdzcdcds");
       let errorMessage = "An unexpected error occurred";
-      
+
       if (axios.isAxiosError(loginError)) {
         if (loginError.response) {
-          errorMessage = loginError.response.data.message || "Invalid credentials";
+          errorMessage =
+            loginError.response.data.message || "Invalid credentials";
         } else if (loginError.request) {
-          errorMessage = "No response from server. Please check your connection.";
+          errorMessage =
+            "No response from server. Please check your connection.";
         }
       }
-      
+
       // Keep the error visible - don't clear it between attempts
       setError(errorMessage);
       throw new Error(errorMessage);
@@ -136,17 +159,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       return data;
     } catch (error) {
       let errorMessage = "An unexpected error occurred";
-      
+
       if (axios.isAxiosError(error)) {
         if (error.response) {
           errorMessage = error.response.data.message || "Failed to sign up";
         } else if (error.request) {
-          errorMessage = "No response from server. Please check your connection.";
+          errorMessage =
+            "No response from server. Please check your connection.";
         }
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
-      
+
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {

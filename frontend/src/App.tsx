@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/auth-context";
-import { UserRole } from "./types/auth";
+import { UserRole } from "./types/types";
 
 // Import your other components
 import {

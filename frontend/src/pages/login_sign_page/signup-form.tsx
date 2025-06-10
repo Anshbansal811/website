@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/auth-context";
-import { UserRole } from "../../types/auth";
+import { UserRole } from "../../types/types";
 
 export const SignupForm = () => {
   const navigate = useNavigate();

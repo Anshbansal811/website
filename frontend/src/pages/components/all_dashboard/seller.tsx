@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { User } from "types/auth";
+import { User } from "types/types";
 
 type SellerDashboardProps = {
   user: User;

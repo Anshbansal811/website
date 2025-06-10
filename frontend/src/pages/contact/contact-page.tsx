@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Contact } from "../../types/auth";
+import { Contact } from "../../types/types";
 import api from "../../utils/axios";
 import { SidePanel } from "../../pages/side_panel/side-panel";
 

@@ -94,11 +94,14 @@ model ProductImage {
 
 model Image {
   id            String      @id @default(uuid())
-  url           String
+  url           String      @map("url")
+  publicId      String      @map("public_id")
   imageTypeId   Int         @map("image_type_id")
   imageType     ImageType   @relation(fields: [imageTypeId], references: [id])
   productImageId String     @map("product_image_id")
   productImage  ProductImage @relation(fields: [productImageId], references: [id])
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
 
   @@map("images")
 }

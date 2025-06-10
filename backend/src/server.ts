@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import contactRoutes from "./routes/contact-routes";
 import authRoutes from "./routes/auth-routes";
-//import productRoutes from "./routes/product-routes";
+import productRoutes from "./routes/product-routes";
 import pool from "./config/db";
 import path from "path";
 import { errorHandler } from "./middleware/error-handler";
@@ -50,15 +50,16 @@ app.use(
 );
 
 // Middleware
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 // Serve uploaded files
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // Routes
-app.use("/api/contact", contactRoutes); 
-app.use("/api/auth", authRoutes); 
-//app.use("/api/products", productRoutes); // Product routes
+app.use("/api/contact", contactRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes); // Product routes
 
 // Error middleware comes last
 app.use(errorHandler);

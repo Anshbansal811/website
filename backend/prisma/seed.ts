@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Seed UserRoles
-  const userRoles = [
+  /*const userRoles = [
     { name: "RETAILER" },
     { name: "CORPORATE" },
     { name: "SELLER" },
@@ -36,8 +36,19 @@ async function main() {
       update: {},
       create: type,
     });
-  }
+  }*/
 
+    const product_types = [
+      { name: "SHIRT" },
+    ];
+  
+    for (const role of product_types) {
+      await prisma.productType.upsert({
+        where: { name: role.name },
+        update: {},
+        create: role,
+      });
+    }
   console.log("Seed data created successfully");
 }
 

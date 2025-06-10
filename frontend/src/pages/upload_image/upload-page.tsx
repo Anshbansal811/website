@@ -1,40 +1,66 @@
 import { useState, useEffect } from "react";
 import api from "../../utils/axios";
 import { SidePanel } from "../../pages/side_panel/side-panel";
+import { ExistingProduct, ImageFiles, ImagePreview, FormData } from "./types";
 
-interface FormData {
-  quantity: string;
-  productType: string;
-  color: string;
-  mrp?: string;
-  productName: string;
-  description: string;
-  existingProductId?: string;
-}
+// Helper function to convert File to base64
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
+};
 
-interface ExistingProduct {
-  _id: string;
-  name: string;
-  type: string;
-}
+// Helper function to compress image
+const compressImage = async (file: File): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const MAX_WIDTH = 1200;
+      const MAX_HEIGHT = 1200;
+      let width = img.width;
+      let height = img.height;
 
-interface ImageFiles {
-  front: File | null;
-  back: File | null;
-  left: File | null;
-  right: File | null;
-  top: File | null;
-  bottom: File | null;
-  details: File[];
-  others: File[];
-}
+      if (width > height) {
+        if (width > MAX_WIDTH) {
+          height *= MAX_WIDTH / width;
+          width = MAX_WIDTH;
+        }
+      } else {
+        if (height > MAX_HEIGHT) {
+          width *= MAX_HEIGHT / height;
+          height = MAX_HEIGHT;
+        }
+      }
 
-interface ImagePreview {
-  id: string;
-  url: string;
-  type: string;
-  file: File;
-}
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx?.drawImage(img, 0, 0, width, height);
+
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            const compressedFile = new File([blob], file.name, {
+              type: "image/jpeg",
+              lastModified: Date.now(),
+            });
+            resolve(compressedFile);
+          } else {
+            reject(new Error("Failed to compress image"));
+          }
+        },
+        "image/jpeg",
+        0.7
+      );
+    };
+    img.onerror = () => reject(new Error("Failed to load image"));
+  });
+};
 
 export const UploadPage = () => {
   const [selectedFiles, setSelectedFiles] = useState<ImageFiles>({
@@ -78,7 +104,7 @@ export const UploadPage = () => {
     fetchExistingProducts();
   }, []);
 
-  const handleFileChange = (
+  const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
     type: keyof ImageFiles
   ) => {
@@ -88,22 +114,32 @@ export const UploadPage = () => {
     const file = files[0];
     if (!file) return;
 
-    // Update selected files
-    setSelectedFiles((prev) => ({
-      ...prev,
-      [type]:
-        type === "details" || type === "others" ? [...prev[type], file] : file,
-    }));
+    try {
+      // Compress the image before storing
+      const compressedFile = await compressImage(file);
 
-    // Create preview
-    const preview: ImagePreview = {
-      id: Math.random().toString(36).substr(2, 9),
-      url: URL.createObjectURL(file),
-      type,
-      file,
-    };
+      // Update selected files
+      setSelectedFiles((prev) => ({
+        ...prev,
+        [type]:
+          type === "details" || type === "others"
+            ? [...prev[type], compressedFile]
+            : compressedFile,
+      }));
 
-    setPreviews((prev) => [...prev, preview]);
+      // Create preview
+      const preview: ImagePreview = {
+        id: Math.random().toString(36).substr(2, 9),
+        url: URL.createObjectURL(compressedFile),
+        type,
+        file: compressedFile,
+      };
+
+      setPreviews((prev) => [...prev, preview]);
+    } catch (error) {
+      console.error("Error compressing image:", error);
+      setError("Failed to process image. Please try again.");
+    }
   };
 
   const removeImage = (id: string) => {
@@ -177,49 +213,40 @@ export const UploadPage = () => {
     setError("");
 
     try {
-      const formDataToSend = new FormData();
+      // Convert all images to base64
+      const convertToBase64 = async (file: File | null) => {
+        if (!file) return null;
+        return await fileToBase64(file);
+      };
 
-      // Conditionally append product details or existing product ID
-      if (selectedExistingProductId) {
-        formDataToSend.append("existingProductId", selectedExistingProductId);
-      } else {
-        formDataToSend.append("productName", formData.productName);
-        formDataToSend.append("productType", formData.productType);
-        formDataToSend.append("description", formData.description);
-      }
-      formDataToSend.append("color", formData.color);
-      formDataToSend.append("mrp", formData.mrp || "");
-      formDataToSend.append("quantity", formData.quantity);
+      const convertArrayToBase64 = async (files: File[]) => {
+        return Promise.all(files.map(fileToBase64));
+      };
 
-      // Append images
-      formDataToSend.append("frontImage", selectedFiles.front);
-      formDataToSend.append("backImage", selectedFiles.back);
-      if (selectedFiles.left)
-        formDataToSend.append("leftImage", selectedFiles.left);
-      if (selectedFiles.right)
-        formDataToSend.append("rightImage", selectedFiles.right);
-      if (selectedFiles.top)
-        formDataToSend.append("topImage", selectedFiles.top);
-      if (selectedFiles.bottom)
-        formDataToSend.append("bottomImage", selectedFiles.bottom);
+      const requestData = {
+        // Product details
+        productName: formData.productName,
+        productType: formData.productType,
+        description: formData.description,
+        color: formData.color,
+        mrp: formData.mrp,
+        quantity: formData.quantity,
+        existingProductId: selectedExistingProductId || undefined,
 
-      // Append detail images
-      selectedFiles.details.forEach((file) => {
-        formDataToSend.append("detailImages", file);
-      });
+        // Convert images to base64
+        frontImage: await convertToBase64(selectedFiles.front),
+        backImage: await convertToBase64(selectedFiles.back),
+        leftImage: await convertToBase64(selectedFiles.left),
+        rightImage: await convertToBase64(selectedFiles.right),
+        topImage: await convertToBase64(selectedFiles.top),
+        bottomImage: await convertToBase64(selectedFiles.bottom),
+        detailImages: await convertArrayToBase64(selectedFiles.details),
+        otherImages: await convertArrayToBase64(selectedFiles.others),
+      };
 
-      // Append other images
-      selectedFiles.others.forEach((file) => {
-        formDataToSend.append("otherImages", file);
-      });
+      const response = await api.post("/products/upload", requestData);
 
-      const response = await api.post("/products/upload", formDataToSend, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      if (response.data) {
+      if (response.data.success) {
         // Clear form after successful upload
         setSelectedFiles({
           front: null,
@@ -241,9 +268,8 @@ export const UploadPage = () => {
           description: "",
           existingProductId: undefined,
         });
-        setSelectedExistingProductId(""); // Reset selected existing product
+        setSelectedExistingProductId("");
 
-        // Show success message
         alert("Product uploaded successfully!");
       }
     } catch (err: any) {

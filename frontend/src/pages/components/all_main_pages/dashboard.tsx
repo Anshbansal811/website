@@ -1,6 +1,6 @@
 import { SidePanel } from "../../../pages/side_panel/side-panel";
 import { useAuth } from "../../../contexts/auth-context";
-import { UserRole } from "../../../types/auth";
+import { UserRole } from "../../../types/types";
 import {
   CorporateDashboard,
   RetailerDashboard,
