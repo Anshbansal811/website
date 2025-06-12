@@ -1,41 +1,31 @@
 import { Request, Response } from "express";
-import { createUsers, ContactUsers } from "../models/contact-model";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
 export const submitContactForm = async (req: Request, res: Response) => {
   try {
-    const submission: ContactUsers = req.body;
 
-    // Validate required fields
-    const requiredFields = [
-      "name",
-      "phonenumber",
-      "subject",
-      "message",
-      "state",
-      "city",
-      "company",
-    ];
-    const missingFields = requiredFields.filter(
-      (field) => !submission[field as keyof ContactUsers]
-    );
-
-    if (missingFields.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: `Missing required fields: ${missingFields.join(", ")}`,
-      });
-    }
-
-    // Validate phone number format (basic validation)
+     // Validate phone number format (basic validation)
     const phoneRegex = /^[0-9]{10,15}$/;
-    if (!phoneRegex.test(submission.phonenumber)) {
+    if (!phoneRegex.test(req.body.phonenumber)) {
       return res.status(400).json({
         success: false,
         message: "Invalid phone number format",
       });
     }
 
-    const result = await createUsers(submission);
+    const result = await prisma.contact.create({
+      data: {
+        name: req.body.name,
+        city: req.body.city,
+        state: req.body.state,
+        message: req.body.message,
+        phonenumber: req.body.phonenumber,
+        company: req.body.company,
+        subject: req.body.subject || "",
+        gstPan: req.body.gst_pan,
+      },
+    });
 
     // Use status 200 for successful form submission to match frontend expectations
     res.status(200).json({

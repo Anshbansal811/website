@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/auth-context";
-import { UserRole } from "./types/auth";
+import { UserRole } from "./types/types";
 
 // Import your other components
 import {
@@ -11,7 +11,7 @@ import {
   Contactpage,
   Dashboard,
   Unauthorized,
-} from "./pages/components/index";
+} from "./pages/components/all_main_pages/index";
 import {
   LoginForm,
   ProtectedRoute,
@@ -19,6 +19,8 @@ import {
 } from "./pages/login_sign_page/index";
 import { Navbar } from "./pages/header/navebar";
 import { Footer } from "./pages/footer/footer";
+import { ContactsPage } from "./pages/contact/contact-page";
+import { UploadPage } from "./pages/upload_image/upload-page";
 
 const App: React.FC = () => {
   return (
@@ -46,7 +48,25 @@ const App: React.FC = () => {
                 }
               />
 
-              {/* Role-specific routes */}
+              <Route
+                path="/dashboard/contacts"
+                element={
+                  <ProtectedRoute>
+                    <ContactsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/upload"
+                element={
+                  <ProtectedRoute>
+                    {/* Render upload content directly or pass to a layout component */}
+                    <UploadPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Role-specific routes (Consider removing or redirecting if Dashboard handles all role views) */}
               <Route
                 path="/retailer-dashboard"
                 element={

@@ -1,4 +1,4 @@
-import { User } from "types/auth";
+import { User } from "types/types";
 
 type RetailerDashboardProps = {
   user: User;
@@ -11,8 +11,8 @@ export const RetailerDashboard = ({ user }: RetailerDashboardProps) => {
         <span className="text-gray-700">Welcome, {user?.name}</span>
       </h2>
       <p className="text-gray-600">
-        Welcome to your retailer dashboard. Here you can manage your products and
-        connect with sellers.
+        Welcome to your retailer dashboard. Here you can manage your products
+        and connect with sellers.
       </p>
       {/* Add retailer-specific features here */}
     </div>

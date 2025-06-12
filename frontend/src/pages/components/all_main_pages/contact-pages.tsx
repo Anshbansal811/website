@@ -35,25 +35,6 @@ export const Contactpage = () => {
   };
 
   const validateForm = () => {
-    const requiredFields = [
-      "name",
-      "phonenumber",
-      "subject",
-      "message",
-      "state",
-      "city",
-      "company",
-    ];
-    const missingFields = requiredFields.filter(
-      (field) => !formData[field as keyof typeof formData]
-    );
-
-    if (missingFields.length > 0) {
-      setError(
-        `Please fill in all required fields: ${missingFields.join(", ")}`
-      );
-      return false;
-    }
 
     const phoneRegex = /^[0-9]{10,15}$/;
     if (!phoneRegex.test(formData.phonenumber)) {
@@ -180,120 +161,100 @@ export const Contactpage = () => {
                     </div>
                   )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label
-                        htmlFor="name"
-                        className="block text-gray-700 mb-2"
-                      >
+                    <label>
+                      <div className="text-gray-700 after:ml-0.5 after:text-red-500 after:content-['*'] ...">
                         Your Name
-                      </label>
+                      </div>
                       <input
                         type="text"
-                        id="name"
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
+                        placeholder="your name"
                         required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
                       />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="Company Name"
-                        className="block text-gray-700 mb-2"
-                      >
+                    </label>
+                    <label>
+                      <div className="text-gray-700 after:ml-0.5 after:text-red-500 after:content-['*'] ...">
                         Company Name
-                      </label>
+                      </div>
                       <input
                         type="text"
-                        id="company"
                         name="company"
                         value={formData.company}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
+                        placeholder="Your Company Name"
                         required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
                       />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="phone number"
-                        className="block text-gray-700 mb-2"
-                      >
+                    </label>
+                    <label>
+                      <div className="text-gray-700 after:ml-0.5 after:text-red-500 after:content-['*'] ...">
                         Phone Number
-                      </label>
+                      </div>
                       <input
                         type="number"
-                        id="phonenumber"
                         name="phonenumber"
                         value={formData.phonenumber}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
+                        placeholder="+91XXXXXXXXXX"
                         required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
                       />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="State"
-                        className="block text-gray-700 mb-2"
-                      >
+                    </label>
+                    <label>
+                      <div className="text-gray-700 after:ml-0.5 after:text-red-500 after:content-['*'] ...">
                         State
-                      </label>
+                      </div>
                       <input
                         type="text"
-                        id="state"
                         name="state"
                         value={formData.state}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
+                        placeholder="your state"
                         required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
                       />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="City"
-                        className="block text-gray-700 mb-2"
-                      >
+                    </label>
+                    <label>
+                      <div className="text-gray-700 after:ml-0.5 after:text-red-500 after:content-['*'] ...">
                         City
-                      </label>
+                      </div>
                       <input
                         type="text"
-                        id="city"
                         name="city"
                         value={formData.city}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
+                        placeholder="your city"
                         required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
                       />
-                    </div>
-                    <div>
-                      <label htmlFor="GST" className="block text-gray-700 mb-2">
+                    </label>
+                    <label>
+                      <div className="text-gray-700 after:ml-0.5 after:text-red-500...">
                         GST Number/ PAN Number
-                      </label>
+                      </div>
                       <input
                         type="text"
-                        id="gst"
                         name="gst_pan"
                         value={formData.gst_pan}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
                       />
-                    </div>
+                    </label>
                   </div>
 
-                  <div>
-                    <label
-                      htmlFor="subject"
-                      className="block text-gray-700 mb-2"
-                    >
+                  <label className="block text-gray-700 mb-2">
+                    <div className="text-gray-700 after:ml-0.5 after:text-red-500 ...">
                       Subject
-                    </label>
+                    </div>
                     <select
                       id="subject"
                       name="subject"
                       value={formData.subject}
                       onChange={handleChange}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
-                      required
                     >
                       <option value="">Select a topic</option>
                       <option value="Customer Support">Customer Support</option>
@@ -302,8 +263,8 @@ export const Contactpage = () => {
                       <option value="Partnerships">Partnerships</option>
                       <option value="Other">Other</option>
                     </select>
-                  </div>
-
+                  </label>
+                  
                   <div>
                     <label
                       htmlFor="message"
@@ -318,7 +279,6 @@ export const Contactpage = () => {
                       onChange={handleChange}
                       rows={5}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
-                      required
                     ></textarea>
                   </div>
 

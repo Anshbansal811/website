@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { UserRole } from "../types/auth";
+import { UserRole } from "../types/types";
 import api from "../utils/axios";
 import axios from "axios";
-import { User, AuthContextType } from "../types/auth";
+import { User, AuthContextType } from "../types/types";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -11,37 +11,89 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      api
-        .get("/auth/me")
-        .then(({ data }) => {
+    const loadUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (token) {
+          setAuthToken(token);
+          // Validate token and fetch user data
+          const { data } = await api.get("/auth/me");
           setUser(data.user);
-        })
-        .catch(() => {
-          localStorage.removeItem("token");
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
+        }
+      } catch (err) {
+        console.error("Failed to load user from token:", err);
+        setAuthToken(null); // Clear invalid token
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUser();
+  }, []); // Run only once on mount
+
+  // Function to clear error
+  const clearError = () => {
+    setError(null);
+  };
+
+  // Function to check if current user can access another user's data
+  const canAccessUserData = (targetUserId: string): boolean => {
+    if (!user) return false;
+
+    // If user is trying to access their own data, allow it
+    if (user.id === targetUserId) return true;
+
+    // RETAILER and CORPORATE users can only access their own data
+    if (user.role === UserRole.RETAILER || user.role === UserRole.CORPORATE) {
+      return user.id === targetUserId;
     }
-  }, []);
+
+    // SELLER can access all data (assuming they have admin privileges)
+    return user.role === UserRole.SELLER;
+  };
+
+  // Function to set auth token in axios headers
+  const setAuthToken = (token: string | null) => {
+    if (token) {
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      localStorage.setItem("token", token);
+    } else {
+      delete api.defaults.headers.common["Authorization"];
+      localStorage.removeItem("token");
+    }
+  };
 
   const login = async (email: string, password: string) => {
     try {
-      console.log("Sending signup request with data:");
+      setLoading(true);
+
       const { data } = await api.post("/auth/login", { email, password });
-      localStorage.setItem("token", data.token);
+      setAuthToken(data.token);
       setUser(data.user);
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        throw new Error(error.response.data.message || "Invalid credentials");
+      return data;
+    } catch (loginError) {
+      console.log("cdzcdcds");
+      let errorMessage = "An unexpected error occurred";
+
+      if (axios.isAxiosError(loginError)) {
+        if (loginError.response) {
+          errorMessage =
+            loginError.response.data.message || "Invalid credentials";
+        } else if (loginError.request) {
+          errorMessage =
+            "No response from server. Please check your connection.";
+        }
       }
-      throw new Error("Invalid credentials");
+
+      // Keep the error visible - don't clear it between attempts
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -54,6 +106,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     phonenumber: string;
   }) => {
     try {
+      // Don't clear error immediately - let it show until success or manual clear
+      setLoading(true);
+
       // Validate required fields
       if (
         !userData.email ||
@@ -71,9 +126,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         throw new Error("Invalid email format");
       }
 
-      // Validate password length
+      // Validate password requirements
       if (userData.password.length < 6) {
         throw new Error("Password must be at least 6 characters long");
+      }
+
+      // Validate phone number
+      if (!/^\d{10}$/.test(userData.phonenumber)) {
+        throw new Error("Phone number must be exactly 10 digits");
       }
 
       // Validate role
@@ -92,40 +152,53 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         );
       }
 
-      console.log("Sending signup request with data:", userData);
       const { data } = await api.post("/auth/signup", userData);
-      localStorage.setItem("token", data.token);
-      setUser(data.user);
+      setError(null); // Only clear error on successful signup
+      // Don't set auth token or user state on signup
+      // Let the user login explicitly
+      return data;
     } catch (error) {
+      let errorMessage = "An unexpected error occurred";
+
       if (axios.isAxiosError(error)) {
         if (error.response) {
-          console.error("Signup error response:", error.response.data);
-          throw new Error(error.response.data.message || "Failed to sign up");
+          errorMessage = error.response.data.message || "Failed to sign up";
         } else if (error.request) {
-          console.error("Signup error request:", error.request);
-          throw new Error("No response from server");
-        } else {
-          console.error("Signup error:", error.message);
-          throw new Error(error.message);
+          errorMessage =
+            "No response from server. Please check your connection.";
         }
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
       }
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error("Failed to sign up");
+
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    setAuthToken(null);
     setUser(null);
+    setError(null);
   };
 
   const isAuthenticated = !!user;
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, isAuthenticated, login, signup, logout }}
+      value={{
+        user,
+        loading,
+        error,
+        isAuthenticated,
+        login,
+        signup,
+        logout,
+        canAccessUserData,
+        clearError,
+      }}
     >
       {children}
     </AuthContext.Provider>
