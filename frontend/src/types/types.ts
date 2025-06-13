@@ -46,8 +46,11 @@ export interface AuthContextType {
 export interface Contact {
   id: number;
   name: string;
-  email: string;
-  message: string;
-  created_at: string;
   phonenumber: string;
+  company: String;
+  createdAt: string;
+  city: String;
+  state: String;
+  gstPan: String;
+  message: string;
 }

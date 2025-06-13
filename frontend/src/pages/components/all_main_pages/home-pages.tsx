@@ -43,7 +43,7 @@ export const Homepage = () => {
               </p>
               {/* Optional CTA */}
               <Link
-                to="/shop"
+                to="/products"
                 className="inline-block bg-modus-orange text-white px-6 py-3 rounded-full hover:bg-orange-600 transition"
               >
                 Shop Now
@@ -80,7 +80,7 @@ export const Homepage = () => {
 
           <div className="flex justify-end mb-4">
             <Link
-              to="/shop"
+              to="/products"
               className="text-modus-orange hover:underline flex items-center"
             >
               More <span className="ml-2">→</span>

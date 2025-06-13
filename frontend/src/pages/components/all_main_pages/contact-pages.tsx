@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../../utils/axios";
 
 export const Contactpage = () => {
   useEffect(() => {
@@ -20,10 +20,6 @@ export const Contactpage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  //const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-
-  const API_URL = "https://website-c0fw.onrender.com";
-
   const handleChange = (e: React.ChangeEvent<Element>) => {
     const { name, value } = e.target as HTMLInputElement;
     setFormData((prevState) => ({
@@ -35,7 +31,6 @@ export const Contactpage = () => {
   };
 
   const validateForm = () => {
-
     const phoneRegex = /^[0-9]{10,15}$/;
     if (!phoneRegex.test(formData.phonenumber)) {
       setError("Please enter a valid phone number (10-15 digits)");
@@ -55,18 +50,8 @@ export const Contactpage = () => {
 
     setIsSubmitting(true);
     try {
-      console.log("Submitting to:", `${API_URL}/api/contact/submit`);
-      const response = await axios.post(
-        `${API_URL}/api/contact/submit`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          withCredentials: true,
-        }
-      );
+      const response = await api.post("/contact/submit", formData);
+      console.log("Submitting to:contact/submit");
 
       console.log("Response:", response.data);
 
@@ -82,21 +67,13 @@ export const Contactpage = () => {
           company: "",
           gst_pan: "",
         });
-      } else {
-        setError(
-          response.data.message || "Error submitting form. Please try again."
-        );
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting form:", error);
-      if (axios.isAxiosError(error)) {
-        setError(
-          error.response?.data?.message ||
-            "Network error. Please try again later."
-        );
-      } else {
-        setError("Network error. Please try again later.");
-      }
+      setError(
+        error.response?.data?.message ||
+          "Error submitting form. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -264,7 +241,7 @@ export const Contactpage = () => {
                       <option value="Other">Other</option>
                     </select>
                   </label>
-                  
+
                   <div>
                     <label
                       htmlFor="message"
