@@ -27,7 +27,7 @@ export const signup = async (req: Request, res: Response) => {
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     // Create new user
     const user = await prisma.user.create({
       data: {
@@ -125,7 +125,7 @@ export const login = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({success: false, message: error});
+    res.status(500).json({ success: false, message: error });
   }
 };
 
@@ -156,6 +156,101 @@ export const getMe = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("GetMe error:", error);
-    res.status(500).json({ success: false,message: error });
+    res.status(500).json({ success: false, message: error });
+  }
+};
+
+export const refreshToken = async (req: Request, res: Response) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      return res.status(400).json({ message: "Refresh token is required" });
+    }
+
+    const decoded = jwt.verify(refreshToken, JWT_SECRET) as { userId: string };
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      include: { role: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const newToken = jwt.sign(
+      { userId: user.id, role: user.role.name },
+      JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
+    res.json({ success: true, token: newToken });
+  } catch (error) {
+    res.status(401).json({ message: "Invalid refresh token" });
+  }
+};
+
+export const logout = async (req: Request, res: Response) => {
+  res.json({ success: true, message: "Logged out successfully" });
+};
+
+export const forgotPassword = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Generate reset token
+    const resetToken = jwt.sign({ userId: user.id }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    // TODO: Send email with reset token
+    res.json({ success: true, message: "Reset instructions sent to email" });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to process request" });
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const { token, newPassword } = req.body;
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({
+      where: { id: decoded.userId },
+      data: { password: hashedPassword },
+    });
+
+    res.json({ success: true, message: "Password reset successful" });
+  } catch (error) {
+    res.status(400).json({ message: "Invalid or expired token" });
+  }
+};
+
+export const updateProfile = async (req: Request, res: Response) => {
+  try {
+    const { name, email, company } = req.body;
+    const user = await prisma.user.update({
+      where: { id: req.user?.userId },
+      data: { name, email, company },
+      include: { role: true },
+    });
+
+    res.json({
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role.name,
+        company: user.company,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to update profile" });
   }
 };

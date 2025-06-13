@@ -4,8 +4,7 @@ const prisma = new PrismaClient();
 
 export const submitContactForm = async (req: Request, res: Response) => {
   try {
-
-     // Validate phone number format (basic validation)
+    // Validate phone number format (basic validation)
     const phoneRegex = /^[0-9]{10,15}$/;
     if (!phoneRegex.test(req.body.phonenumber)) {
       return res.status(400).json({
@@ -51,5 +50,50 @@ export const submitContactForm = async (req: Request, res: Response) => {
       message: "Error submitting contact form",
       error: error instanceof Error ? error.message : "Unknown error",
     });
+  }
+};
+
+export const getContactById = async (req: Request, res: Response) => {
+  try {
+    const contact = await prisma.contact.findUnique({
+      where: { id: parseInt(req.params.id) },
+    });
+    if (!contact) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Contact not found" });
+    }
+    res.json({ success: true, data: contact });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch contact" });
+  }
+};
+
+export const updateContact = async (req: Request, res: Response) => {
+  try {
+    const contact = await prisma.contact.update({
+      where: { id: parseInt(req.params.id) },
+      data: req.body,
+    });
+    res.json({ success: true, data: contact });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to update contact" });
+  }
+};
+
+export const deleteContact = async (req: Request, res: Response) => {
+  try {
+    await prisma.contact.delete({
+      where: { id: parseInt(req.params.id) },
+    });
+    res.json({ success: true, message: "Contact deleted successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to delete contact" });
   }
 };

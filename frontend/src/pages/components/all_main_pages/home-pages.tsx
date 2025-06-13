@@ -12,7 +12,7 @@ const latestProducts = [
   { id: 6, name: "Sherwani", image: image3 },
 ];
 
-export const Homepage = () => {
+const Homepage = () => {
   return (
     <div className="min-h-screen">
       <section className="bg-white py-12 md:py-20">
@@ -204,3 +204,5 @@ export const Homepage = () => {
     </div>
   );
 };
+
+export default Homepage;

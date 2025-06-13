@@ -62,7 +62,7 @@ const compressImage = async (file: File): Promise<File> => {
   });
 };
 
-export const UploadPage = () => {
+const UploadPage = () => {
   const [selectedFiles, setSelectedFiles] = useState<ImageFiles>({
     front: null,
     back: null,
@@ -97,7 +97,7 @@ export const UploadPage = () => {
       try {
         const response = await api.get<{
           existingProductName: ExistingProduct[];
-        }>("/products/existing");
+        }>("/products/existing/names");
         setExistingProducts(response.data.existingProductName);
       } catch (err: any) {
         console.error("Error fetching existing products:", err);
@@ -524,3 +524,5 @@ export const UploadPage = () => {
     </div>
   );
 };
+
+export default UploadPage;
