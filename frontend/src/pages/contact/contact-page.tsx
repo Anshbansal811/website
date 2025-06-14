@@ -13,7 +13,7 @@ interface PaginationInfo {
   hasPreviousPage: boolean;
 }
 
-export const ContactsPage = () => {
+const ContactsPage = () => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -159,3 +159,5 @@ export const ContactsPage = () => {
     </div>
   );
 };
+
+export default ContactsPage

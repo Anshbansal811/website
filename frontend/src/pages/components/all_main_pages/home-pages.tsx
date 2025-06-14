@@ -12,7 +12,7 @@ const latestProducts = [
   { id: 6, name: "Sherwani", image: image3 },
 ];
 
-export const Homepage = () => {
+const Homepage = () => {
   return (
     <div className="min-h-screen">
       <section className="bg-white py-12 md:py-20">
@@ -25,6 +25,9 @@ export const Homepage = () => {
                   src={image1}
                   alt="Model wearing green sweater"
                   className="w-full h-full"
+                  loading="lazy"
+                  width={224}
+                  height={276}
                 />
               </div>
             </div>
@@ -57,6 +60,9 @@ export const Homepage = () => {
                   src={image2}
                   alt="Model wearing green sweater"
                   className="w-full h-full"
+                  loading="lazy"
+                  width={224}
+                  height={276}
                 />
               </div>
             </div>
@@ -100,6 +106,9 @@ export const Homepage = () => {
                       src={product.image}
                       alt={product.name}
                       className="w-full h-full"
+                      loading="lazy"
+                      width={400}
+                      height={480}
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button className="w-full text-center py-1">
@@ -148,7 +157,14 @@ export const Homepage = () => {
                     borderRadius: "60% 40% 30% 70% / 50% 30% 70% 50%",
                   }}
                 >
-                  <img src={image1} alt="Model" className="w-[85%] h-auto" />
+                  <img
+                    src={image1}
+                    alt="Model"
+                    className="w-[85%] h-auto"
+                    loading="lazy"
+                    width={272}
+                    height={357}
+                  />
                 </div>
 
                 {/* Curved SVG Text */}
@@ -194,6 +210,9 @@ export const Homepage = () => {
                     src={image3}
                     alt="Model in yellow outfit"
                     className="w-full h-full"
+                    loading="lazy"
+                    width={400}
+                    height={480}
                   />
                 </div>
               </div>
@@ -204,3 +223,5 @@ export const Homepage = () => {
     </div>
   );
 };
+
+export default Homepage;

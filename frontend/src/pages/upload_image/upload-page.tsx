@@ -62,7 +62,7 @@ const compressImage = async (file: File): Promise<File> => {
   });
 };
 
-export const UploadPage = () => {
+const UploadPage = () => {
   const [selectedFiles, setSelectedFiles] = useState<ImageFiles>({
     front: null,
     back: null,
@@ -215,7 +215,7 @@ export const UploadPage = () => {
     setError("");
 
     try {
-      // Convert all images to base64
+      // Lazy load the image conversion functions
       const convertToBase64 = async (file: File | null) => {
         if (!file) return null;
         return await fileToBase64(file);
@@ -225,27 +225,51 @@ export const UploadPage = () => {
         return Promise.all(files.map(fileToBase64));
       };
 
-      const requestData = {
-        // Product details
-        productName: formData.productName,
-        productType: formData.productType,
-        description: formData.description,
-        color: formData.color,
-        mrp: formData.mrp,
-        quantity: formData.quantity,
-        existingProductId: selectedExistingProductId || undefined,
+      // Lazy load the request data construction
+      const requestData = await (async () => {
+        const [
+          frontImage,
+          backImage,
+          leftImage,
+          rightImage,
+          topImage,
+          bottomImage,
+          detailImages,
+          otherImages,
+        ] = await Promise.all([
+          convertToBase64(selectedFiles.front),
+          convertToBase64(selectedFiles.back),
+          convertToBase64(selectedFiles.left),
+          convertToBase64(selectedFiles.right),
+          convertToBase64(selectedFiles.top),
+          convertToBase64(selectedFiles.bottom),
+          convertArrayToBase64(selectedFiles.details),
+          convertArrayToBase64(selectedFiles.others),
+        ]);
 
-        // Convert images to base64
-        frontImage: await convertToBase64(selectedFiles.front),
-        backImage: await convertToBase64(selectedFiles.back),
-        leftImage: await convertToBase64(selectedFiles.left),
-        rightImage: await convertToBase64(selectedFiles.right),
-        topImage: await convertToBase64(selectedFiles.top),
-        bottomImage: await convertToBase64(selectedFiles.bottom),
-        detailImages: await convertArrayToBase64(selectedFiles.details),
-        otherImages: await convertArrayToBase64(selectedFiles.others),
-      };
+        return {
+          // Product details
+          productName: formData.productName,
+          productType: formData.productType,
+          description: formData.description,
+          color: formData.color,
+          mrp: formData.mrp,
+          quantity: formData.quantity,
+          existingProductId: selectedExistingProductId || undefined,
 
+          // Converted images
+          frontImage,
+          backImage,
+          leftImage,
+          rightImage,
+          topImage,
+          bottomImage,
+          detailImages,
+          otherImages,
+        };
+      })();
+
+      // Lazy load the API call
       const response = await api.post("/products/upload", requestData);
 
       if (response.data.success) {
@@ -524,3 +548,5 @@ export const UploadPage = () => {
     </div>
   );
 };
+
+export default UploadPage;

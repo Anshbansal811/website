@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
+    "@tanstack/react-virtual": "^3.13.10",
     "@types/react-router-dom": "^5.3.3",
     "acorn": "^8.14.1",
     "acorn-jsx": "^5.3.2",

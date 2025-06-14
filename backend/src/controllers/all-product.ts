@@ -79,13 +79,6 @@ export const getAllProduct = async (req: Request, res: Response) => {
             },
           };
 
-          console.log("Transformed product:", {
-            id: transformed._id,
-            name: transformed.name,
-            hasVariation: !!transformed.variation,
-            hasImages: !!transformed.images,
-          });
-
           return transformed;
         } catch (error) {
           console.error("Error transforming product:", product.id, error);
