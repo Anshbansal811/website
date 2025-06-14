@@ -1,18 +1,54 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import image1 from "../../../image/image1.png";
 import image2 from "../../../image/image2.jpg";
 import image3 from "../../../image/image3.png";
+import api from "../../../utils/axios";
 
-const latestProducts = [
-  { id: 1, name: "Blazer", image: image1 },
-  { id: 2, name: "Blazer", image: image2 },
-  { id: 3, name: "Sherwani", image: image3 },
-  { id: 4, name: "Blazer", image: image1 },
-  { id: 5, name: "Blazer", image: image2 },
-  { id: 6, name: "Sherwani", image: image3 },
-];
+interface Product {
+  _id: string;
+  name: string;
+  type: string;
+  description: string;
+  variation: {
+    color: string;
+    mrp: number;
+    stock: number;
+  };
+  images: {
+    front: string;
+    back: string;
+    left?: string;
+    right?: string;
+    top?: string;
+    bottom?: string;
+    details: string[];
+    others: string[];
+  };
+}
 
 const Homepage = () => {
+  const [latestProducts, setLatestProducts] = useState<Product[]>([]);
+  const currentYear = new Date().getFullYear();
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await api.get("/products/allproduct");
+        // Get random 10 products from the response
+        const allProducts = response.data;
+        const randomProducts = allProducts
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 10);
+        setLatestProducts(randomProducts);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   return (
     <div className="min-h-screen">
       <section className="bg-white py-12 md:py-20">
@@ -80,7 +116,7 @@ const Homepage = () => {
             >
               Latest collection
               <br />
-              <span className="text-dark">of modus 2023</span>
+              <span className="text-dark">of modus {currentYear}</span>
             </h2>
           </div>
 
@@ -97,13 +133,13 @@ const Homepage = () => {
             <div className="flex gap-4 md:gap-6">
               {latestProducts.map((product) => (
                 <div
-                  key={product.id}
+                  key={product._id}
                   className="w-[45vw] sm:w-[30vw] md:w-[220px] group flex-shrink-0 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition duration-300"
                 >
                   <div className="bg-gray-100 rounded-lg overflow-hidden relative">
                     {/*w-[65vw] h-[85vw] sm:w-[35vw] sm:h-[40vw] md:w-[30vw] md:h-[35vw] lg:w-[25vw] lg:h-[30vw] rounded-full bg-modus-orange overflow-hidden mx-auto lg:mx-0*/}
                     <img
-                      src={product.image}
+                      src={product.images.front}
                       alt={product.name}
                       className="w-full h-full"
                       loading="lazy"
@@ -137,7 +173,7 @@ const Homepage = () => {
               <p className="text-gray-700 mb-6 text-lg">
                 Fashion is a form of self-expression and autonomy at a
                 particular period and place and in a specific context for
-                clothing, footwear, lifestyle, accessories.
+                clothing, lifestyle, accessories.
               </p>
               <Link
                 to="/about"
