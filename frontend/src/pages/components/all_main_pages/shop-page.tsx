@@ -33,8 +33,13 @@ export const Shopepage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await api.get("/products"); // Assuming this is your endpoint to fetch all products
-        setProducts(response.data);
+        const response = await api.get("/products/allproduct");
+        console.log(response)
+        // Filter out any products with null variations
+        const validProducts = response.data.filter(
+          (product: any) => product.variation !== null
+        );
+        setProducts(validProducts);
       } catch (err: any) {
         setError(err.response?.data?.message || "Failed to fetch products");
       } finally {
