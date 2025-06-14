@@ -76,7 +76,7 @@ export const MainFooter = () => {
           <div className="space-y-2">
             <div>
               <Link
-                to="/shop"
+                to="/products"
                 className="text-gray-300 hover:text-modus-orange"
               >
                 Men's Collection
@@ -84,7 +84,7 @@ export const MainFooter = () => {
             </div>
             <div>
               <Link
-                to="/shop/new-arrivals"
+                to="/products/new-arrivals"
                 className="text-gray-300 hover:text-modus-orange"
               >
                 New Arrivals
@@ -92,7 +92,7 @@ export const MainFooter = () => {
             </div>
             <div>
               <Link
-                to="/shop/discounts"
+                to="/products/discounts"
                 className="text-gray-300 hover:text-modus-orange"
               >
                 Discounts

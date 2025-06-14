@@ -25,7 +25,7 @@ interface Product {
   };
 }
 
-export const Shopepage = () => {
+const Shopepage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -72,3 +72,5 @@ export const Shopepage = () => {
     </div>
   );
 };
+
+export default Shopepage;
