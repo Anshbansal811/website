@@ -1,18 +1,54 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import image1 from "../../../image/image1.png";
 import image2 from "../../../image/image2.jpg";
 import image3 from "../../../image/image3.png";
+import api from "../../../utils/axios";
 
-const latestProducts = [
-  { id: 1, name: "Blazer", image: image1 },
-  { id: 2, name: "Blazer", image: image2 },
-  { id: 3, name: "Sherwani", image: image3 },
-  { id: 4, name: "Blazer", image: image1 },
-  { id: 5, name: "Blazer", image: image2 },
-  { id: 6, name: "Sherwani", image: image3 },
-];
+interface Product {
+  _id: string;
+  name: string;
+  type: string;
+  description: string;
+  variation: {
+    color: string;
+    mrp: number;
+    stock: number;
+  };
+  images: {
+    front: string;
+    back: string;
+    left?: string;
+    right?: string;
+    top?: string;
+    bottom?: string;
+    details: string[];
+    others: string[];
+  };
+}
 
-export const Homepage = () => {
+const Homepage = () => {
+  const [latestProducts, setLatestProducts] = useState<Product[]>([]);
+  const currentYear = new Date().getFullYear();
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await api.get("/products/allproduct");
+        // Get random 10 products from the response
+        const allProducts = response.data;
+        const randomProducts = allProducts
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 10);
+        setLatestProducts(randomProducts);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   return (
     <div className="min-h-screen">
       <section className="bg-white py-12 md:py-20">
@@ -25,6 +61,9 @@ export const Homepage = () => {
                   src={image1}
                   alt="Model wearing green sweater"
                   className="w-full h-full"
+                  loading="lazy"
+                  width={224}
+                  height={276}
                 />
               </div>
             </div>
@@ -43,7 +82,7 @@ export const Homepage = () => {
               </p>
               {/* Optional CTA */}
               <Link
-                to="/shop"
+                to="/products"
                 className="inline-block bg-modus-orange text-white px-6 py-3 rounded-full hover:bg-orange-600 transition"
               >
                 Shop Now
@@ -57,6 +96,9 @@ export const Homepage = () => {
                   src={image2}
                   alt="Model wearing green sweater"
                   className="w-full h-full"
+                  loading="lazy"
+                  width={224}
+                  height={276}
                 />
               </div>
             </div>
@@ -74,13 +116,13 @@ export const Homepage = () => {
             >
               Latest collection
               <br />
-              <span className="text-dark">of modus 2023</span>
+              <span className="text-dark">of modus {currentYear}</span>
             </h2>
           </div>
 
           <div className="flex justify-end mb-4">
             <Link
-              to="/shop"
+              to="/products"
               className="text-modus-orange hover:underline flex items-center"
             >
               More <span className="ml-2">→</span>
@@ -91,15 +133,18 @@ export const Homepage = () => {
             <div className="flex gap-4 md:gap-6">
               {latestProducts.map((product) => (
                 <div
-                  key={product.id}
+                  key={product._id}
                   className="w-[45vw] sm:w-[30vw] md:w-[220px] group flex-shrink-0 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition duration-300"
                 >
                   <div className="bg-gray-100 rounded-lg overflow-hidden relative">
                     {/*w-[65vw] h-[85vw] sm:w-[35vw] sm:h-[40vw] md:w-[30vw] md:h-[35vw] lg:w-[25vw] lg:h-[30vw] rounded-full bg-modus-orange overflow-hidden mx-auto lg:mx-0*/}
                     <img
-                      src={product.image}
+                      src={product.images.front}
                       alt={product.name}
                       className="w-full h-full"
+                      loading="lazy"
+                      width={400}
+                      height={480}
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button className="w-full text-center py-1">
@@ -128,7 +173,7 @@ export const Homepage = () => {
               <p className="text-gray-700 mb-6 text-lg">
                 Fashion is a form of self-expression and autonomy at a
                 particular period and place and in a specific context for
-                clothing, footwear, lifestyle, accessories.
+                clothing, lifestyle, accessories.
               </p>
               <Link
                 to="/about"
@@ -148,7 +193,14 @@ export const Homepage = () => {
                     borderRadius: "60% 40% 30% 70% / 50% 30% 70% 50%",
                   }}
                 >
-                  <img src={image1} alt="Model" className="w-[85%] h-auto" />
+                  <img
+                    src={image1}
+                    alt="Model"
+                    className="w-[85%] h-auto"
+                    loading="lazy"
+                    width={272}
+                    height={357}
+                  />
                 </div>
 
                 {/* Curved SVG Text */}
@@ -194,6 +246,9 @@ export const Homepage = () => {
                     src={image3}
                     alt="Model in yellow outfit"
                     className="w-full h-full"
+                    loading="lazy"
+                    width={400}
+                    height={480}
                   />
                 </div>
               </div>
@@ -204,3 +259,5 @@ export const Homepage = () => {
     </div>
   );
 };
+
+export default Homepage;

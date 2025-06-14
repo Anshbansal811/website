@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ProductCard } from "../ProductCard";
+import ProductCard from "../ProductCard";
 import api from "../../../utils/axios";
 
 interface Product {
@@ -25,7 +25,7 @@ interface Product {
   };
 }
 
-export const Shopepage = () => {
+const Shopepage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,8 +33,13 @@ export const Shopepage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await api.get("/products"); // Assuming this is your endpoint to fetch all products
-        setProducts(response.data);
+        const response = await api.get("/products/allproduct");
+        console.log(response);
+        // Filter out any productswith null variations
+        const validProducts = response.data.filter(
+          (product: any) => product.variation !== null
+        );
+        setProducts(validProducts);
       } catch (err: any) {
         setError(err.response?.data?.message || "Failed to fetch products");
       } finally {
@@ -72,3 +77,5 @@ export const Shopepage = () => {
     </div>
   );
 };
+
+export default Shopepage;

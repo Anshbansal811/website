@@ -9,9 +9,11 @@ export interface FormData {
 }
 
 export interface ExistingProduct {
-  _id: string;
+  id: string;
   name: string;
-  type: string;
+  type: {
+    name: string;
+  };
 }
 
 export interface ImageFiles {

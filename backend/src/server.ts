@@ -25,8 +25,8 @@ pool
 
 // CORS configuration
 const allowedOrigins = [
-  "https://frontend1-t6n0.onrender.com",
-  //"http://localhost:5173", // Keep local development working
+  //"https://frontend1-t6n0.onrender.com",
+  "http://localhost:5173", // Keep local development working
 ].filter(Boolean);
 
 app.use(
