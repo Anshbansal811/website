@@ -2,28 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ProductCard from "../ProductCard";
 import api from "../../../utils/axios";
-
-interface Product {
-  _id: string;
-  name: string;
-  type: string;
-  description: string;
-  variation: {
-    color: string;
-    mrp: number;
-    stock: number;
-  };
-  images: {
-    front: string;
-    back: string;
-    left?: string;
-    right?: string;
-    top?: string;
-    bottom?: string;
-    details: string[];
-    others: string[];
-  };
-}
+import { Product } from "../../../types/types";
 
 const Shopepage = () => {
   const [products, setProducts] = useState<Product[]>([]);

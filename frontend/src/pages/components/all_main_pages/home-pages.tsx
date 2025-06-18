@@ -4,28 +4,8 @@ import image1 from "../../../image/image1.png";
 import image2 from "../../../image/image2.jpg";
 import image3 from "../../../image/image3.png";
 import api from "../../../utils/axios";
-
-interface Product {
-  _id: string;
-  name: string;
-  type: string;
-  description: string;
-  variation: {
-    color: string;
-    mrp: number;
-    stock: number;
-  };
-  images: {
-    front: string;
-    back: string;
-    left?: string;
-    right?: string;
-    top?: string;
-    bottom?: string;
-    details: string[];
-    others: string[];
-  };
-}
+import { Product } from "../../../types/types";
+import ProductCard from "../ProductCard";
 
 const Homepage = () => {
   const [latestProducts, setLatestProducts] = useState<Product[]>([]);
@@ -129,32 +109,11 @@ const Homepage = () => {
             </Link>
           </div>
 
-          <div className="overflow-x-auto">
-            <div className="flex gap-4 md:gap-6">
+          <div className="overflow-x-auto pb-4 -mx-4 px-4">
+            <div className="flex gap-4 md:gap-6 min-w-max">
               {latestProducts.map((product) => (
-                <div
-                  key={product._id}
-                  className="w-[45vw] sm:w-[30vw] md:w-[220px] group flex-shrink-0 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition duration-300"
-                >
-                  <div className="bg-gray-100 rounded-lg overflow-hidden relative">
-                    {/*w-[65vw] h-[85vw] sm:w-[35vw] sm:h-[40vw] md:w-[30vw] md:h-[35vw] lg:w-[25vw] lg:h-[30vw] rounded-full bg-modus-orange overflow-hidden mx-auto lg:mx-0*/}
-                    <img
-                      src={product.images.front}
-                      alt={product.name}
-                      className="w-full h-full"
-                      loading="lazy"
-                      width={400}
-                      height={480}
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="w-full text-center py-1">
-                        Add to Cart
-                      </button>
-                    </div>
-                  </div>
-                  <div className="mt-4 text-center">
-                    <h3 className="font-medium">{product.name}</h3>
-                  </div>
+                <div className="w-[280px] flex-shrink-0">
+                  <ProductCard key={product._id} product={product} />
                 </div>
               ))}
             </div>

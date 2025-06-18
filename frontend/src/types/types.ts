@@ -54,3 +54,25 @@ export interface Contact {
   gstPan: String;
   message: string;
 }
+
+export interface Product {
+  _id: string;
+  name: string;
+  type: string;
+  description: string;
+  variation: {
+    color: string;
+    mrp: number;
+    stock: number;
+  };
+  images: {
+    front: string;
+    back: string;
+    left?: string;
+    right?: string;
+    top?: string;
+    bottom?: string;
+    details: string[];
+    others: string[];
+  };
+}
