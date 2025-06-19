@@ -27,7 +27,7 @@ export const signup = async (req: Request, res: Response) => {
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     // Create new user
     const user = await prisma.user.create({
       data: {
@@ -125,7 +125,7 @@ export const login = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({success: false, message: error});
+    res.status(500).json({ success: false, message: error });
   }
 };
 
@@ -156,6 +156,6 @@ export const getMe = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("GetMe error:", error);
-    res.status(500).json({ success: false,message: error });
+    res.status(500).json({ success: false, message: error });
   }
 };

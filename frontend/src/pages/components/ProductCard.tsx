@@ -1,51 +1,53 @@
+import React, { memo } from "react";
 import { Link } from "react-router-dom";
+import { Product } from "../../types/types";
 
 interface ProductCardProps {
-  product: {
-    _id: string;
-    name: string;
-    type: string;
-    description: string;
-    variation: {
-      color: string;
-      mrp: number;
-      stock: number;
-    };
-    images: {
-      front: string;
-      back: string;
-      left?: string;
-      right?: string;
-      top?: string;
-      bottom?: string;
-      details: string[];
-      others: string[];
-    };
-  };
+  key: string;
+  product: Product;
 }
 
-export const ProductCard = ({ product }: ProductCardProps) => {
+const ProductCard: React.FC<ProductCardProps> = memo(({ key, product }) => {
   return (
-    <Link to={`/product/${product._id}`}>
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-shadow duration-300 hover:shadow-xl">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col w-full max-w-xs mx-auto border border-gray-200">
+      <Link
+        to={`/product/${product._id}`}
+        className="flex justify-center items-center p-4 h-64 bg-gray-50"
+      >
         <img
-          className="w-full h-64 object-fill object-center"
           src={product.images.front}
           alt={product.name}
+          className="object-contain h-48 w-auto"
+          loading="lazy"
+          width={200}
+          height={240}
         />
-        <div className="p-4">
-          <h3 className="text-lg font-semibold text-gray-900 truncate">
+      </Link>
+      <div className="flex-1 flex flex-col justify-between p-4">
+        <div>
+          <h3 className="font-semibold text-base text-gray-900 truncate">
             {product.name}
           </h3>
-          <p className="mt-1 text-gray-600 text-sm">{product.type}</p>
-          <div className="mt-2 flex items-center justify-between">
-            <span className="text-xl font-bold text-gray-900">
-              RS {product.variation.mrp.toFixed(2)}
-            </span>
-            {/* Add more product details or actions here if needed */}
-          </div>
+          <p className="mt-1 text-xs text-gray-500 uppercase tracking-wide">
+            {product.type}
+          </p>
         </div>
+        <div className="mt-2 flex items-center justify-between">
+          <span className="text-lg font-bold text-gray-900">
+            ₹{product.variation.mrp}
+          </span>
+          <span className="text-xs text-gray-500">
+            Stock: {product.variation.stock}
+          </span>
+        </div>
+        <button className="mt-4 w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 rounded transition-colors">
+          Add to Cart
+        </button>
       </div>
-    </Link>
+    </div>
   );
-};
+});
+
+ProductCard.displayName = "ProductCard";
+
+export default ProductCard;
