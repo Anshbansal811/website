@@ -16,6 +16,12 @@ export const SellerDashboard = ({ user }: SellerDashboardProps) => {
           >
             Contacts
           </Link>
+          <Link
+            to="/dashboard/upload"
+            className={`flex items-center text-gray-700 rounded-lg hover:bg-gray-100 transition-colors `}
+          >
+            Upload
+          </Link>
         </div>
 
         <div className="flex">
