@@ -7,7 +7,7 @@ import {
   SellerDashboard,
 } from "../all_dashboard";
 
-export const Dashboard = () => {
+const Dashboard = () => {
   const { user } = useAuth();
 
   const renderMainContent = () => {
@@ -43,3 +43,4 @@ export const Dashboard = () => {
     </div>
   );
 };
+export default Dashboard

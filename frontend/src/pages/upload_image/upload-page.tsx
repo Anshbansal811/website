@@ -62,7 +62,7 @@ const compressImage = async (file: File): Promise<File> => {
   });
 };
 
-export const UploadPage = () => {
+const UploadPage = () => {
   const [selectedFiles, setSelectedFiles] = useState<ImageFiles>({
     front: null,
     back: null,
@@ -95,8 +95,10 @@ export const UploadPage = () => {
   useEffect(() => {
     const fetchExistingProducts = async () => {
       try {
-        const response = await api.get<ExistingProduct[]>("/products/existing");
-        setExistingProducts(response.data);
+        const response = await api.get<{
+          existingProductName: ExistingProduct[];
+        }>("/products/existing");
+        setExistingProducts(response.data.existingProductName);
       } catch (err: any) {
         console.error("Error fetching existing products:", err);
       }
@@ -190,12 +192,12 @@ export const UploadPage = () => {
         }));
       } else {
         // Populate product name and type if an existing product is selected
-        const selectedProduct = existingProducts.find((p) => p._id === value);
+        const selectedProduct = existingProducts.find((p) => p.id === value);
         if (selectedProduct) {
           setFormData((prev) => ({
             ...prev,
             productName: selectedProduct.name,
-            productType: selectedProduct.type,
+            productType: selectedProduct.type.name,
             description: "", // Description should be manually entered for new variations
           }));
         }
@@ -213,7 +215,7 @@ export const UploadPage = () => {
     setError("");
 
     try {
-      // Convert all images to base64
+      // Lazy load the image conversion functions
       const convertToBase64 = async (file: File | null) => {
         if (!file) return null;
         return await fileToBase64(file);
@@ -223,27 +225,51 @@ export const UploadPage = () => {
         return Promise.all(files.map(fileToBase64));
       };
 
-      const requestData = {
-        // Product details
-        productName: formData.productName,
-        productType: formData.productType,
-        description: formData.description,
-        color: formData.color,
-        mrp: formData.mrp,
-        quantity: formData.quantity,
-        existingProductId: selectedExistingProductId || undefined,
+      // Lazy load the request data construction
+      const requestData = await (async () => {
+        const [
+          frontImage,
+          backImage,
+          leftImage,
+          rightImage,
+          topImage,
+          bottomImage,
+          detailImages,
+          otherImages,
+        ] = await Promise.all([
+          convertToBase64(selectedFiles.front),
+          convertToBase64(selectedFiles.back),
+          convertToBase64(selectedFiles.left),
+          convertToBase64(selectedFiles.right),
+          convertToBase64(selectedFiles.top),
+          convertToBase64(selectedFiles.bottom),
+          convertArrayToBase64(selectedFiles.details),
+          convertArrayToBase64(selectedFiles.others),
+        ]);
 
-        // Convert images to base64
-        frontImage: await convertToBase64(selectedFiles.front),
-        backImage: await convertToBase64(selectedFiles.back),
-        leftImage: await convertToBase64(selectedFiles.left),
-        rightImage: await convertToBase64(selectedFiles.right),
-        topImage: await convertToBase64(selectedFiles.top),
-        bottomImage: await convertToBase64(selectedFiles.bottom),
-        detailImages: await convertArrayToBase64(selectedFiles.details),
-        otherImages: await convertArrayToBase64(selectedFiles.others),
-      };
+        return {
+          // Product details
+          productName: formData.productName,
+          productType: formData.productType,
+          description: formData.description,
+          color: formData.color,
+          mrp: formData.mrp,
+          quantity: formData.quantity,
+          existingProductId: selectedExistingProductId || undefined,
 
+          // Converted images
+          frontImage,
+          backImage,
+          leftImage,
+          rightImage,
+          topImage,
+          bottomImage,
+          detailImages,
+          otherImages,
+        };
+      })();
+
+      // Lazy load the API call
       const response = await api.post("/products/upload", requestData);
 
       if (response.data.success) {
@@ -307,8 +333,8 @@ export const UploadPage = () => {
                 >
                   <option value="">-- Create New Product --</option>
                   {existingProducts.map((product) => (
-                    <option key={product._id} value={product._id}>
-                      {product.name} ({product.type})
+                    <option key={product.id} value={product.id}>
+                      {product.name} ({product.type.name})
                     </option>
                   ))}
                 </select>
@@ -396,185 +422,110 @@ export const UploadPage = () => {
                   disabled={!!selectedExistingProductId}
                 />
               </label>
-
-              <label className="col-span-3">
-                <div className="text-gray-700 after:ml-0.5 after:text-red-500 after:content-['*']">
-                  Product Description
-                </div>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
-                  placeholder="Enter product description"
-                  rows={3}
-                  required={!selectedExistingProductId}
-                  disabled={!!selectedExistingProductId}
-                />
-              </label>
             </div>
 
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-gray-900">
-                Required Images
+                Upload Images
               </h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Front Image *
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFileChange(e, "front")}
-                    className="hidden"
-                    id="front-upload"
-                  />
-                  <label
-                    htmlFor="front-upload"
-                    className="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                  >
-                    Upload Front Image
-                  </label>
-                </div>
-
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Back Image *
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFileChange(e, "back")}
-                    className="hidden"
-                    id="back-upload"
-                  />
-                  <label
-                    htmlFor="back-upload"
-                    className="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                  >
-                    Upload Back Image
-                  </label>
-                </div>
-              </div>
-
-              <h3 className="text-lg font-medium text-gray-900">
-                Additional Views
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                {["left", "right", "top", "bottom"].map((view) => (
-                  <div
-                    key={view}
-                    className="border-2 border-dashed border-gray-300 rounded-lg p-4"
-                  >
+              <div className="space-y-4">
+                <div className="flex gap-4 items-end">
+                  <div className="flex-1">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {view.charAt(0).toUpperCase() + view.slice(1)} Image
+                      Select Image Type
+                    </label>
+                    <select
+                      id="image-type-select"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
+                    >
+                      <option value="">Select image type</option>
+                      <option value="front">Front Image</option>
+                      <option value="back">Back Image</option>
+                      <option value="left">Left Image</option>
+                      <option value="right">Right Image</option>
+                      <option value="top">Top Image</option>
+                      <option value="bottom">Bottom Image</option>
+                      <option value="details">Detail Images</option>
+                      <option value="others">Other Images</option>
+                    </select>
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Upload Image
                     </label>
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) =>
-                        handleFileChange(e, view as keyof ImageFiles)
-                      }
+                      id="image-upload"
                       className="hidden"
-                      id={`${view}-upload`}
+                      onChange={(e) => {
+                        const select = document.getElementById(
+                          "image-type-select"
+                        ) as HTMLSelectElement;
+                        const type = select.value as keyof ImageFiles;
+                        if (type) {
+                          handleFileChange(e, type);
+                          select.value = ""; // Reset selection after upload
+                        } else {
+                          setError("Please select an image type first");
+                        }
+                      }}
                     />
                     <label
-                      htmlFor={`${view}-upload`}
-                      className="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                      htmlFor="image-upload"
+                      className="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 w-full justify-center"
                     >
-                      Upload {view.charAt(0).toUpperCase() + view.slice(1)}{" "}
-                      Image
+                      Upload Image
                     </label>
                   </div>
-                ))}
-              </div>
+                </div>
 
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Detail Images
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleFileChange(e, "details")}
-                  className="hidden"
-                  id="details-upload"
-                  multiple
-                />
-                <label
-                  htmlFor="details-upload"
-                  className="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  Upload Detail Images
-                </label>
-              </div>
-
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Other Images
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleFileChange(e, "others")}
-                  className="hidden"
-                  id="others-upload"
-                  multiple
-                />
-                <label
-                  htmlFor="others-upload"
-                  className="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  Upload Other Images
-                </label>
+                {previews.length > 0 && (
+                  <div className="mt-4">
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      3D Preview ({previews.length} images)
+                    </h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                      {previews.map((preview) => (
+                        <div
+                          key={preview.id}
+                          className="bg-white rounded-lg shadow-lg overflow-hidden"
+                        >
+                          <div className="aspect-square w-full relative">
+                            <img
+                              src={preview.url}
+                              alt={`${preview.type} preview`}
+                              className="w-full h-full object-contain bg-gray-50"
+                            />
+                            <button
+                              onClick={() => removeImage(preview.id)}
+                              className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                          <div className="p-2 text-center text-sm text-gray-600">
+                            {preview.type.charAt(0).toUpperCase() +
+                              preview.type.slice(1)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-
-            {previews.length > 0 && (
-              <div className="mt-4">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Preview ({previews.length} images)
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  {previews.map((preview) => (
-                    <div
-                      key={preview.id}
-                      className="bg-white rounded-lg shadow-lg overflow-hidden"
-                    >
-                      <div className="aspect-square w-full relative">
-                        <img
-                          src={preview.url}
-                          alt={`${preview.type} preview`}
-                          className="w-full h-full object-contain bg-gray-50"
-                        />
-                        <button
-                          onClick={() => removeImage(preview.id)}
-                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                      <div className="p-2 text-center text-sm text-gray-600">
-                        {preview.type.charAt(0).toUpperCase() +
-                          preview.type.slice(1)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {error && <div className="text-red-600 text-sm mt-2">{error}</div>}
 
@@ -597,3 +548,5 @@ export const UploadPage = () => {
     </div>
   );
 };
+
+export default UploadPage;

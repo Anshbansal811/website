@@ -9,6 +9,6 @@ router.post("/signup", signup);
 router.post("/login", login);
 
 // Protected routes
-router.get("/me",authenticate, getMe);
+router.get("/me", authenticate, getMe);
 
 export default router;

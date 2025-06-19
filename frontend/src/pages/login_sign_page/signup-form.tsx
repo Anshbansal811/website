@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/auth-context";
 import { UserRole } from "../../types/types";
 
-export const SignupForm = () => {
+// Lazy load the loading spinner component
+const LoadingSpinner = lazy(() => import("../../components/LoadingSpinner"));
+
+const SignupForm = () => {
   const navigate = useNavigate();
   const { signup } = useAuth();
   const [formData, setFormData] = useState({
@@ -62,6 +65,17 @@ export const SignupForm = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const renderButtonContent = () => {
+    if (loading) {
+      return (
+        <Suspense fallback={<span>Signing up...</span>}>
+          <LoadingSpinner />
+        </Suspense>
+      );
+    }
+    return success ? "Success!" : "Sign up";
   };
 
   return (
@@ -228,11 +242,7 @@ export const SignupForm = () => {
                     disabled={loading || success}
                     className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                   >
-                    {loading
-                      ? "Signing up..."
-                      : success
-                      ? "Success!"
-                      : "Sign up"}
+                    {renderButtonContent()}
                   </button>
                 </div>
               </div>
@@ -243,3 +253,5 @@ export const SignupForm = () => {
     </div>
   );
 };
+
+export default SignupForm
