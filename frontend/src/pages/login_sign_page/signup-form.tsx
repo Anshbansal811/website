@@ -10,7 +10,7 @@ export const SignupForm = () => {
     email: "",
     password: "",
     name: "",
-    role: "" as UserRole | "",
+    role: "CORPORATE",
     company: "",
     phonenumber: "",
   });
@@ -140,44 +140,6 @@ export const SignupForm = () => {
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="Enter password"
                   />
-                </label>
-
-                <label className="block">
-                  <div className="text-gray-700 after:ml-0.5 after:text-red-500 after:content-['*']">
-                    Role
-                  </div>
-                  <div className="relative">
-                    <select
-                      id="role"
-                      name="role"
-                      required
-                      value={formData.role}
-                      onChange={handleChange}
-                      className="appearance-none block w-full px-3 py-2 pr-8 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    >
-                      <option value="" disabled>
-                        Select a role
-                      </option>
-                      <option value={UserRole.RETAILER}>Retailer</option>
-                      <option value={UserRole.CORPORATE}>Corporate</option>
-                      <option value={UserRole.SELLER}>Seller</option>
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
-                      <svg
-                        className="h-4 w-4 text-gray-400"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.66a.75.75 0 01-1.08 0l-4.25-4.66a.75.75 0 01.02-1.06z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
                 </label>
 
                 {(formData.role === UserRole.CORPORATE ||

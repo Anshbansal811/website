@@ -40,6 +40,8 @@ async function main() {
 
     const product_types = [
       { name: "SHIRT" },
+      { name: "SHERWANI" },
+      { name: "BLAZERS" }
     ];
   
     for (const role of product_types) {
