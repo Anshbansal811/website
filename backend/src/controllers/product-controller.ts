@@ -39,7 +39,6 @@ export const uploadProduct = async (req: Request, res: Response) => {
       });
 
       if (existingProduct) {
-        console.log("existingProduct")
         productId = existingProduct.id;
       } else {
         const newProduct = await tx.product.create({

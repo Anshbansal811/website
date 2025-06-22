@@ -409,7 +409,7 @@ const UploadPage = () => {
 
               <label className="col-span-2">
                 <div className="text-gray-700 after:ml-0.5 after:text-red-500 after:content-['*']">
-                  Product Name
+                  Article Number/Name
                 </div>
                 <input
                   type="text"
