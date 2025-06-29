@@ -54,25 +54,26 @@ export interface Contact {
   gstPan: String;
   message: string;
 }
+export interface ProductImage {
+  url: string;
+  imageType: { name: string }; // Only 'FRONT' images will be present from all-product API
+}
+
+export interface ProductVariationImageGroup {
+  images: ProductImage[];
+}
+
+export interface ProductVariation {
+  color: string;
+  mrp: number;
+  stock: number;
+  images: ProductVariationImageGroup[];
+}
 
 export interface Product {
-  _id: string;
+  id: string;
   name: string;
-  type: string;
   description: string;
-  variation: {
-    color: string;
-    mrp: number;
-    stock: number;
-  };
-  images: {
-    front: string;
-    back: string;
-    left?: string;
-    right?: string;
-    top?: string;
-    bottom?: string;
-    details: string[];
-    others: string[];
-  };
+  type: { name: string }; // 💡 tightened
+  variations: ProductVariation[];
 }

@@ -5,7 +5,10 @@ import image2 from "../../../image/image2.jpg";
 import image3 from "../../../image/image3.png";
 import api from "../../../utils/axios";
 import { Product } from "../../../types/types";
-import ProductCard from "../ProductCard";
+import ProductCard, {
+  flattenProductsToImageCards,
+  ImageCard,
+} from "../ProductCard";
 
 const Homepage = () => {
   const [latestProducts, setLatestProducts] = useState<Product[]>([]);
@@ -17,6 +20,7 @@ const Homepage = () => {
         const response = await api.get("/products/allproduct");
         // Get random 10 products from the response
         const allProducts = response.data;
+        console.log("Fetched products:", allProducts);
         const randomProducts = allProducts
           .sort(() => 0.5 - Math.random())
           .slice(0, 10);
@@ -28,6 +32,7 @@ const Homepage = () => {
 
     fetchProducts();
   }, []);
+  const imageCards: ImageCard[] = flattenProductsToImageCards(latestProducts);
 
   return (
     <div className="min-h-screen">
@@ -111,9 +116,11 @@ const Homepage = () => {
 
           <div className="overflow-x-auto pb-4 -mx-4 px-4">
             <div className="flex gap-4 md:gap-6 min-w-max">
-              {latestProducts.map((product) => (
-                <div className="w-[280px] flex-shrink-0">
-                  <ProductCard key={product._id} product={product} />
+              {imageCards.map((card, idx) => (
+                <div
+                  className="w-[280px] flex-shrink-0"
+                >
+                  <ProductCard card={card} />
                 </div>
               ))}
             </div>
