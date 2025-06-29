@@ -15,6 +15,13 @@ export interface ExistingProduct {
     name: string;
   };
 }
+export interface ProductType {
+  id: string;
+  name: string;
+  type: {
+    name: string;
+  };
+}
 
 export interface ImageFiles {
   front: File | null;

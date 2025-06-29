@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import api from "../../utils/axios";
 import { SidePanel } from "../../pages/side_panel/side-panel";
-import { ExistingProduct, ImageFiles, ImagePreview, FormData } from "./types";
+import {
+  ExistingProduct,
+  ImageFiles,
+  ImagePreview,
+  FormData,
+  ProductType,
+} from "./types";
 
 // Helper function to convert File to base64
 const fileToBase64 = (file: File): Promise<string> => {
@@ -89,6 +95,7 @@ const UploadPage = () => {
   const [existingProducts, setExistingProducts] = useState<ExistingProduct[]>(
     []
   );
+  const [productsType, setProductsType] = useState<ExistingProduct[]>([]);
   const [selectedExistingProductId, setSelectedExistingProductId] =
     useState<string>("");
 
@@ -97,8 +104,10 @@ const UploadPage = () => {
       try {
         const response = await api.get<{
           existingProductName: ExistingProduct[];
+          productsType: ProductType[];
         }>("/products/existing");
         setExistingProducts(response.data.existingProductName);
+        setProductsType(response.data.productsType);
       } catch (err: any) {
         console.error("Error fetching existing products:", err);
       }
@@ -189,6 +198,7 @@ const UploadPage = () => {
           productName: "",
           productType: "",
           description: "",
+          mrp: "",
         }));
       } else {
         // Populate product name and type if an existing product is selected
@@ -197,7 +207,9 @@ const UploadPage = () => {
           setFormData((prev) => ({
             ...prev,
             productName: selectedProduct.name,
-            productType: selectedProduct.type.name,
+            productType:
+              productsType.find((pt) => pt.name === selectedProduct.type.name)
+                ?.id || "",
             description: "", // Description should be manually entered for new variations
           }));
         }
@@ -357,20 +369,36 @@ const UploadPage = () => {
                 />
               </label>
 
+              {/* Product Type field: show as text if existing product is selected, else dropdown */}
               <label>
                 <div className="text-gray-700 after:ml-0.5 after:text-red-500 after:content-['*']">
                   Product Type
                 </div>
-                <input
-                  type="text"
-                  name="productType"
-                  value={formData.productType}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
-                  placeholder="Enter product type"
-                  required={!selectedExistingProductId}
-                  disabled={!!selectedExistingProductId}
-                />
+                {selectedExistingProductId ? (
+                  <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-700">
+                    {(() => {
+                      const selectedProduct = existingProducts.find(
+                        (p) => p.id === selectedExistingProductId
+                      );
+                      return selectedProduct ? selectedProduct.type.name : "";
+                    })()}
+                  </div>
+                ) : (
+                  <select
+                    name="productType"
+                    value={formData.productType}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
+                    required={!selectedExistingProductId}
+                  >
+                    <option value="">Select Product Type</option>
+                    {productsType.map((product) => (
+                      <option key={product.id} value={product.id}>
+                        {product.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </label>
 
               <label>
