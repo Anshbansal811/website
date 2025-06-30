@@ -45,6 +45,7 @@ const LoginForm = lazy(() => import("./pages/login_sign_page/login-form"));
 const SignupForm = lazy(() => import("./pages/login_sign_page/signup-form"));
 const ContactsPage = lazy(() => import("./pages/contact/contact-page"));
 const UploadPage = lazy(() => import("./pages/upload_image/upload-page"));
+const ProductDetailPage = lazy(() => import("./pages/product_detail_page/product-detail-page"));
 
 // Keep Navbar and Footer as regular imports since they're needed immediately
 import { Navbar } from "./pages/header/navebar";
@@ -91,6 +92,14 @@ const App: React.FC = () => {
                   element={
                     <ProtectedRoute>
                       <UploadPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/products"
+                  element={
+                    <ProtectedRoute>
+                      <ProductDetailPage />
                     </ProtectedRoute>
                   }
                 />
