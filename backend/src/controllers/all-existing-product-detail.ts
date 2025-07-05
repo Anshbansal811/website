@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const getAllProduct = async (req: Request, res: Response) => {
+export const getAllExistingProduct = async (req: Request, res: Response) => {
   try {
     const products = await prisma.product.findMany({
       select: {
@@ -59,10 +59,12 @@ export const getAllProduct = async (req: Request, res: Response) => {
         },
       },
     });
-
+  
     if (!Array.isArray(products)) {
       throw new Error("Transformed products is not an array");
     }
+
+    console.log("Fetched products:", products);
 
     res.json(products);
   } catch (error) {

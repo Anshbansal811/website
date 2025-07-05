@@ -1,7 +1,15 @@
 import { useState, useEffect } from "react";
 import api from "../../utils/axios";
 import { SidePanel } from "../../pages/side_panel/side-panel";
-import { ExistingProduct, ImageFiles, ImagePreview, FormData } from "./types";
+import {
+  ExistingProduct,
+  ImageFiles,
+  ImagePreview,
+  FormData,
+  ProductType,
+  Size,
+  SizeQuantity,
+} from "./types";
 
 // Helper function to convert File to base64
 const fileToBase64 = (file: File): Promise<string> => {
@@ -77,28 +85,38 @@ const UploadPage = () => {
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
-    quantity: "",
     productType: "",
     color: "",
     mrp: "",
     productName: "",
     description: "",
     existingProductId: undefined,
+    sizes: [],
   });
 
   const [existingProducts, setExistingProducts] = useState<ExistingProduct[]>(
     []
   );
+  const [productsType, setProductsType] = useState<ProductType[]>([]);
   const [selectedExistingProductId, setSelectedExistingProductId] =
     useState<string>("");
+  const [availableSizes, setAvailableSizes] = useState<Size[]>([]);
+  const [selectedSize, setSelectedSize] = useState<string>("");
+  const [sizeQuantity, setSizeQuantity] = useState<number>(1);
+  const [compressingImage, setCompressingImage] = useState(false);
 
   useEffect(() => {
     const fetchExistingProducts = async () => {
       try {
         const response = await api.get<{
           existingProductName: ExistingProduct[];
+          productsType: ProductType[];
+          size: Size[];
         }>("/products/existing");
         setExistingProducts(response.data.existingProductName);
+        setProductsType(response.data.productsType);
+        setAvailableSizes(response.data.size);
+        console.log("Size:", response.data.size);
       } catch (err: any) {
         console.error("Error fetching existing products:", err);
       }
@@ -116,6 +134,9 @@ const UploadPage = () => {
     const file = files[0];
     if (!file) return;
 
+    setCompressingImage(true);
+    setError("");
+
     try {
       // Compress the image before storing
       const compressedFile = await compressImage(file);
@@ -129,6 +150,11 @@ const UploadPage = () => {
             : compressedFile,
       }));
 
+      // Remove existing preview of the same type (for single images)
+      if (type !== "details" && type !== "others") {
+        setPreviews((prev) => prev.filter((p) => p.type !== type));
+      }
+
       // Create preview
       const preview: ImagePreview = {
         id: Math.random().toString(36).substr(2, 9),
@@ -141,6 +167,8 @@ const UploadPage = () => {
     } catch (error) {
       console.error("Error compressing image:", error);
       setError("Failed to process image. Please try again.");
+    } finally {
+      setCompressingImage(false);
     }
   };
 
@@ -152,13 +180,16 @@ const UploadPage = () => {
       // Remove from selected files
       setSelectedFiles((current) => {
         if (preview.type === "details" || preview.type === "others") {
+          // For arrays, we need to find the file by comparing the preview file
+          const updatedArray = current[preview.type].filter(
+            (f) => f !== preview.file
+          );
           return {
             ...current,
-            [preview.type]: current[preview.type].filter(
-              (f) => f !== preview.file
-            ),
+            [preview.type]: updatedArray,
           };
         }
+        // For single files, set to null
         return {
           ...current,
           [preview.type]: null,
@@ -189,6 +220,7 @@ const UploadPage = () => {
           productName: "",
           productType: "",
           description: "",
+          mrp: "",
         }));
       } else {
         // Populate product name and type if an existing product is selected
@@ -197,7 +229,9 @@ const UploadPage = () => {
           setFormData((prev) => ({
             ...prev,
             productName: selectedProduct.name,
-            productType: selectedProduct.type.name,
+            productType:
+              productsType.find((pt) => pt.name === selectedProduct.type.name)
+                ?.id || "",
             description: "", // Description should be manually entered for new variations
           }));
         }
@@ -205,10 +239,105 @@ const UploadPage = () => {
     }
   };
 
+  const addSizeQuantity = () => {
+    if (!selectedSize) {
+      setError("Please select a size");
+      return;
+    }
+    if (sizeQuantity <= 0) {
+      setError("Quantity must be greater than 0");
+      return;
+    }
+    const size = availableSizes.find((s) => s.id.toString() === selectedSize);
+    console.log("Selected Size:", size);
+    if (size) {
+      const newSizeQuantity = {
+        sizeId: selectedSize,
+        sizeName: size.name,
+        quantity: sizeQuantity,
+      };
+      const existingIndex = formData.sizes.findIndex(
+        (s) => s.sizeId === selectedSize
+      );
+      if (existingIndex >= 0) {
+        setFormData((prev) => ({
+          ...prev,
+          sizes: prev.sizes.map((s, idx) =>
+            idx === existingIndex ? newSizeQuantity : s
+          ),
+        }));
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          sizes: [...prev.sizes, newSizeQuantity],
+        }));
+      }
+      setError("");
+      setSelectedSize("");
+      setSizeQuantity(1);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addSizeQuantity();
+    }
+  };
+
+  const clearAllSizes = () => {
+    setFormData((prev) => ({
+      ...prev,
+      sizes: [],
+    }));
+    setError(""); // Clear any previous errors
+  };
+
+  const removeSizeQuantity = (sizeId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      sizes: prev.sizes.filter((s) => s.sizeId !== sizeId),
+    }));
+  };
+
   const handleUpload = async () => {
     if (!selectedFiles.front || !selectedFiles.back) {
       setError("Front and back images are required");
       return;
+    }
+
+    if (formData.sizes.length === 0) {
+      setError("At least one size with quantity is required");
+      return;
+    }
+
+    if (!formData.color) {
+      setError("Color is required");
+      return;
+    }
+
+    if (!formData.description) {
+      setError("Description is required");
+      return;
+    }
+
+    if (
+      formData.mrp &&
+      (isNaN(Number(formData.mrp)) || Number(formData.mrp) <= 0)
+    ) {
+      setError("MRP must be a valid positive number");
+      return;
+    }
+
+    if (!selectedExistingProductId) {
+      if (!formData.productName) {
+        setError("Product name is required when creating a new product");
+        return;
+      }
+      if (!formData.productType) {
+        setError("Product type is required when creating a new product");
+        return;
+      }
     }
 
     setUploading(true);
@@ -254,7 +383,7 @@ const UploadPage = () => {
           description: formData.description,
           color: formData.color,
           mrp: formData.mrp,
-          quantity: formData.quantity,
+          sizes: formData.sizes,
           existingProductId: selectedExistingProductId || undefined,
 
           // Converted images
@@ -286,15 +415,25 @@ const UploadPage = () => {
         });
         setPreviews([]);
         setFormData({
-          quantity: "",
           productType: "",
           color: "",
           mrp: "",
           productName: "",
           description: "",
           existingProductId: undefined,
+          sizes: [],
         });
         setSelectedExistingProductId("");
+        setSelectedSize("");
+        setSizeQuantity(1);
+
+        // Clear file input
+        const fileInput = document.getElementById(
+          "image-upload"
+        ) as HTMLInputElement;
+        if (fileInput) {
+          fileInput.value = "";
+        }
 
         alert("Product uploaded successfully!");
       }
@@ -340,37 +479,134 @@ const UploadPage = () => {
                 </select>
               </label>
 
-              <label>
-                <div className="text-gray-700 after:ml-0.5 after:text-red-500 after:content-['*']">
-                  Product Quantity
+              <div className="col-span-3">
+                <div className="text-gray-700 after:ml-0.5 after:text-red-500 after:content-['*'] mb-2">
+                  Product Sizes & Quantities
                 </div>
-                <input
-                  type="number"
-                  name="quantity"
-                  min="1"
-                  max="100"
-                  value={formData.quantity}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
-                  placeholder="Quantity"
-                  required
-                />
-              </label>
+                <div className="space-y-4">
+                  {/* Size selection form */}
+                  <div className="flex gap-4 items-end">
+                    <div className="flex-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Select Size
+                      </label>
+                      <select
+                        value={selectedSize}
+                        onChange={(e) => setSelectedSize(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
+                      >
+                        <option value="">Select size</option>
+                        {availableSizes.map((size) => (
+                          <option key={size.id} value={size.id}>
+                            {size.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Quantity
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="100"
+                        value={sizeQuantity}
+                        onChange={(e) =>
+                          setSizeQuantity(parseInt(e.target.value) || 1)
+                        }
+                        onKeyPress={handleKeyPress}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
+                        placeholder="Quantity (press Enter to add)"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={addSizeQuantity}
+                      disabled={!selectedSize || sizeQuantity <= 0}
+                      className={`px-4 py-2 rounded-md text-white font-medium ${
+                        !selectedSize || sizeQuantity <= 0
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-green-600 hover:bg-green-700"
+                      }`}
+                    >
+                      Add
+                    </button>
+                  </div>
 
+                  {/* Display selected sizes */}
+                  <div className="mt-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-sm font-medium text-gray-700">
+                        Selected Sizes ({formData.sizes.length}):
+                      </h4>
+                      {formData.sizes.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={clearAllSizes}
+                          className="text-red-600 hover:text-red-800 text-sm font-medium"
+                        >
+                          Clear All
+                        </button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                      {formData.sizes.map((sizeQty) => (
+                        <div
+                          key={sizeQty.sizeId}
+                          className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col items-center p-3"
+                        >
+                          <div className="font-bold text-gray-800">
+                            {sizeQty.sizeName}
+                          </div>
+                          <div className="text-gray-700">
+                            Qty: {sizeQty.quantity}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeSizeQuantity(sizeQty.sizeId)}
+                            className="mt-2 text-red-500 hover:text-red-700 text-xs font-bold px-2 py-1 rounded"
+                            title="Remove"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Product Type field: show as text if existing product is selected, else dropdown */}
               <label>
                 <div className="text-gray-700 after:ml-0.5 after:text-red-500 after:content-['*']">
                   Product Type
                 </div>
-                <input
-                  type="text"
-                  name="productType"
-                  value={formData.productType}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
-                  placeholder="Enter product type"
-                  required={!selectedExistingProductId}
-                  disabled={!!selectedExistingProductId}
-                />
+                {selectedExistingProductId ? (
+                  <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-700">
+                    {(() => {
+                      const selectedProduct = existingProducts.find(
+                        (p) => p.id === selectedExistingProductId
+                      );
+                      return selectedProduct ? selectedProduct.type.name : "";
+                    })()}
+                  </div>
+                ) : (
+                  <select
+                    name="productType"
+                    value={formData.productType}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
+                    required={!selectedExistingProductId}
+                  >
+                    <option value="">Select Product Type</option>
+                    {productsType.map((product) => (
+                      <option key={product.id} value={product.id}>
+                        {product.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </label>
 
               <label>
@@ -393,23 +629,23 @@ const UploadPage = () => {
                   MRP
                 </div>
                 <div className="relative">
-                  <span className="absolute left-3 top-2 text-gray-500">
-                    RS
-                  </span>
+                  <span className="absolute left-3 top-2 text-gray-500">₹</span>
                   <input
                     type="number"
                     name="mrp"
                     value={formData.mrp}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
+                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
                     placeholder="Enter price"
+                    min="0"
+                    step="0.01"
                   />
                 </div>
               </label>
 
               <label className="col-span-2">
                 <div className="text-gray-700 after:ml-0.5 after:text-red-500 after:content-['*']">
-                  Product Name
+                  Article Number/Name
                 </div>
                 <input
                   type="text"
@@ -420,6 +656,21 @@ const UploadPage = () => {
                   placeholder="Enter product name"
                   required={!selectedExistingProductId}
                   disabled={!!selectedExistingProductId}
+                />
+              </label>
+
+              <label className="col-span-3">
+                <div className="text-gray-700 after:ml-0.5 after:text-red-500 after:content-['*']">
+                  Description
+                </div>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-modus-orange"
+                  placeholder="Enter product description"
+                  rows={3}
+                  required
                 />
               </label>
             </div>
@@ -532,15 +783,35 @@ const UploadPage = () => {
             <button
               onClick={handleUpload}
               disabled={
-                !selectedFiles.front || !selectedFiles.back || uploading
+                !selectedFiles.front ||
+                !selectedFiles.back ||
+                formData.sizes.length === 0 ||
+                !formData.color ||
+                !formData.description ||
+                (!selectedExistingProductId && !formData.productName) ||
+                (!selectedExistingProductId && !formData.productType) ||
+                uploading ||
+                compressingImage
               }
               className={`w-full py-2 px-4 rounded-md text-white font-medium ${
-                !selectedFiles.front || !selectedFiles.back || uploading
+                !selectedFiles.front ||
+                !selectedFiles.back ||
+                formData.sizes.length === 0 ||
+                !formData.color ||
+                !formData.description ||
+                (!selectedExistingProductId && !formData.productName) ||
+                (!selectedExistingProductId && !formData.productType) ||
+                uploading ||
+                compressingImage
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700"
               }`}
             >
-              {uploading ? "Uploading..." : "Upload Product"}
+              {uploading
+                ? "Uploading..."
+                : compressingImage
+                ? "Processing Image..."
+                : "Upload Product"}
             </button>
           </div>
         </div>

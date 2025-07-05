@@ -29,6 +29,15 @@ model ProductType {
   @@map("product_types")
 }
 
+model ProductSize {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  variationSizes VariationSize[]
+  purchases Purchase[] @relation("PurchaseSizes")
+
+  @@map("product_sizes")
+}
+
 model ImageType {
   id   Int    @id @default(autoincrement())
   name String @unique
@@ -46,50 +55,76 @@ model User {
   password    String   @unique
   products    Product[]
   roleId      Int      @map("role_id")
-  role        UserRole @relation(fields: [roleId], references: [id])
+  role        UserRole @relation(fields: [roleId], references: [id], onDelete: Restrict)
   createdAt   DateTime @default(now()) @map("created_at")
+  cartItems   CartItem[]
+  purchases   Purchase[]
 
   @@map("users")
+  @@index([email])
+  @@index([phonenumber])
 }
 
 model Product {
   id          String   @id @default(uuid())
   name        String
-  typeId      Int      @map("types_id")
-  type        ProductType @relation(fields: [typeId], references: [id])
+  typeId      Int      @map("type_id")
+  type        ProductType @relation(fields: [typeId], references: [id], onDelete: Restrict)
   sellerId    String   @map("seller_id")
-  seller      User     @relation(fields: [sellerId], references: [id])
+  seller      User     @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   description String
   variations  ProductVariation[]
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
+  cartItems   CartItem[]
+  purchases   Purchase[]
 
   @@map("products")
+  @@index([sellerId])
+  @@index([typeId])
 }
 
 model ProductVariation {
   id        String   @id @default(uuid())
   productId String   @map("product_id")
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   color     String
   mrp       Float?
-  stock     Int      @default(0)
+  variationSizes VariationSize[]
   images    ProductImage[]
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("product_variations")
+  @@index([productId])
+}
+
+model VariationSize {
+  id        String   @id @default(uuid())
+  variationId String @map("variation_id")
+  variation   ProductVariation @relation(fields: [variationId], references: [id], onDelete: Cascade)
+  sizeId     Int     @map("size_id")
+  size       ProductSize @relation(fields: [sizeId], references: [id], onDelete: Cascade)
+  quantity   Int     @default(0)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@unique([variationId, sizeId])
+  @@map("variation_sizes")
+  @@index([variationId])
+  @@index([sizeId])
 }
 
 model ProductImage {
   id          String             @id @default(uuid())
   variationId String             @map("variation_id")
-  variation   ProductVariation   @relation(fields: [variationId], references: [id])
+  variation   ProductVariation   @relation(fields: [variationId], references: [id], onDelete: Cascade)
   images      Image[]
   createdAt   DateTime           @default(now()) @map("created_at")
   updatedAt   DateTime           @updatedAt @map("updated_at")
 
   @@map("product_images")
+  @@index([variationId])
 }
 
 model Image {
@@ -97,13 +132,15 @@ model Image {
   url           String      @map("url")
   publicId      String      @map("public_id")
   imageTypeId   Int         @map("image_type_id")
-  imageType     ImageType   @relation(fields: [imageTypeId], references: [id])
+  imageType     ImageType   @relation(fields: [imageTypeId], references: [id], onDelete: Restrict)
   productImageId String     @map("product_image_id")
-  productImage  ProductImage @relation(fields: [productImageId], references: [id])
+  productImage  ProductImage @relation(fields: [productImageId], references: [id], onDelete: Cascade)
   createdAt     DateTime    @default(now()) @map("created_at")
   updatedAt     DateTime    @updatedAt @map("updated_at")
 
   @@map("images")
+  @@index([imageTypeId])
+  @@index([productImageId])
 }
 
 model Contact {
@@ -119,4 +156,39 @@ model Contact {
   createdAt   DateTime @default(now()) @map("created_at")
 
   @@map("contacts")
+  @@index([createdAt])
+}
+
+model Purchase {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String   @map("product_id")
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  place     String
+  state     String
+  city      String
+  quantity Int?
+  sizes ProductSize[] @relation("PurchaseSizes")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("purchases")
+  @@index([userId])
+  @@index([productId])
+  @@index([createdAt])
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String   @map("product_id")
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity Int?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, productId])
+  @@map("cart_items")
+  @@index([userId])
+  @@index([productId])
 }

@@ -3,6 +3,7 @@ import { authenticate } from "../middleware/auth-middleware";
 import { uploadProduct } from "../controllers/product-controller";
 import { getAllExistingProductName } from "../controllers/all-existing-product-name";
 import { getAllProduct } from "../controllers/all-product";
+import { getAllExistingProduct } from "../controllers/all-existing-product-detail";
 
 const router = express.Router();
 
@@ -17,5 +18,7 @@ router.get("/all-image");
 
 // Get all products with their variations and images
 router.get("/allproduct", getAllProduct);
+
+router.get("/allproductdetails", authenticate, getAllExistingProduct);
 
 export default router;

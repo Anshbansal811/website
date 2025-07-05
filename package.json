@@ -142,6 +142,7 @@
     "queue-microtask": "^1.2.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-medium-image-zoom": "^5.2.14",
     "react-refresh": "^0.17.0",
     "react-router": "^7.5.1",
     "react-router-dom": "^7.6.1",

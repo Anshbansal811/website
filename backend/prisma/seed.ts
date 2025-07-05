@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Seed UserRoles
-  /*const userRoles = [
+  const userRoles = [
     { name: "RETAILER" },
     { name: "CORPORATE" },
     { name: "SELLER" },
@@ -36,7 +36,7 @@ async function main() {
       update: {},
       create: type,
     });
-  }*/
+  }
 
     const product_types = [
       { name: "SHIRT" },
@@ -49,6 +49,25 @@ async function main() {
         where: { name: role.name },
         update: {},
         create: role,
+      });
+    }
+
+    const product_sizes = [
+      { name: "XS" },
+      { name: "S" },
+      { name: "M" },
+      { name: "L" },
+      { name: "XL" },
+      { name: "XXL" },
+      { name: "XXXL" },
+      { name: "4XL" },
+      { name: "5XL" },
+    ];
+    for (const size of product_sizes) {
+      await prisma.productSize.upsert({
+        where: { name: size.name },
+        update: {},
+        create: size,
       });
     }
   console.log("Seed data created successfully");
