@@ -28,7 +28,13 @@ export const getAllExistingProductName = async (
         name: true,
       },
     });
-    res.status(200).json({ existingProductName, productsType });
+    const size = await prisma.productSize.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+    })
+    res.status(200).json({ existingProductName, productsType, size });
   } catch (error: any) {
     console.error("Error in getAllUsersHandler:", error);
     res.status(500).json({ message: error.message });

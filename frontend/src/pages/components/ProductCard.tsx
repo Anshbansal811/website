@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Product } from "../../types/types"; //in// Type for a single image card
 import { useAuth } from "../../contexts/auth-context";
 import { useNavigate, useLocation } from "react-router-dom";
+import api from "../../utils/axios";
 
 export interface ImageCard {
   productId: string;
@@ -48,26 +49,75 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = memo(({ card, page }) => {
   const [zoomed, setZoomed] = useState(false);
+  const [showBuyModal, setShowBuyModal] = useState(false);
+  const [buyLoading, setBuyLoading] = useState(false);
+  const [buyError, setBuyError] = useState<string | null>(null);
+  const [buySuccess, setBuySuccess] = useState<string | null>(null);
+  const [place, setPlace] = useState("");
+  const [state, setState] = useState("");
+  const [city, setCity] = useState("");
+  const [quantity, setQuantity] = useState("");
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!isAuthenticated) {
-      // Redirect to signup, preserve intended action and product info
-      navigate("/signup", {
+      navigate("/login", {
         state: {
           from: location,
           addToCartAfterAuth: true,
           productId: card.productId,
-          variationColor: card.variationColor,
         },
         replace: false,
       });
       return;
     }
-    // TODO: Implement actual add to cart logic here
-    alert("Added to cart! (placeholder)");
+    try {
+      await api.post("/cart/add", { productId: card.productId, quantity: 1 });
+      alert("Added to cart!");
+    } catch (error: any) {
+      alert(error.response?.data?.error || "Failed to add to cart");
+    }
+  };
+
+  const handleBuyClick = () => {
+    if (!isAuthenticated) {
+      navigate("/login", {
+        state: {
+          from: location,
+          buyAfterAuth: true,
+          productId: card.productId,
+        },
+        replace: false,
+      });
+      return;
+    }
+    setShowBuyModal(true);
+  };
+
+  const handleBuySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBuyLoading(true);
+    setBuyError(null);
+    setBuySuccess(null);
+    try {
+      await api.post("/purchase/buy", {
+        productId: card.productId,
+        place,
+        state,
+        city,
+      });
+      setBuySuccess("Purchase successful!");
+      setShowBuyModal(false);
+      setPlace("");
+      setState("");
+      setCity("");
+    } catch (error: any) {
+      setBuyError(error.response?.data?.error || "Failed to complete purchase");
+    } finally {
+      setBuyLoading(false);
+    }
   };
 
   return (
@@ -168,6 +218,69 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ card, page }) => {
             >
               Add to Cart
             </button>
+            <button
+              className="mt-2 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded transition-colors"
+              onClick={handleBuyClick}
+            >
+              Buy
+            </button>
+            {/* Buy Modal */}
+            {showBuyModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                <form
+                  className="bg-white p-6 rounded shadow-lg w-full max-w-sm"
+                  onSubmit={handleBuySubmit}
+                >
+                  <h2 className="text-xl font-bold mb-4">
+                    Enter Delivery Details
+                  </h2>
+                  <input
+                    type="text"
+                    placeholder="Place"
+                    className="w-full mb-2 p-2 border rounded"
+                    value={place}
+                    onChange={(e) => setPlace(e.target.value)}
+                    required
+                  />
+                  <input
+                    type="text"
+                    placeholder="State"
+                    className="w-full mb-2 p-2 border rounded"
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
+                    required
+                  />
+                  <input
+                    type="text"
+                    placeholder="City"
+                    className="w-full mb-4 p-2 border rounded"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    required
+                  />
+                  {buyError && (
+                    <div className="text-red-600 mb-2">{buyError}</div>
+                  )}
+                  <div className="flex justify-end gap-2">
+                    <button
+                      type="button"
+                      className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                      onClick={() => setShowBuyModal(false)}
+                      disabled={buyLoading}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                      disabled={buyLoading}
+                    >
+                      {buyLoading ? "Processing..." : "Buy Now"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
           </>
         )}
       </div>

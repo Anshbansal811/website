@@ -12,7 +12,6 @@ export const uploadProduct = async (req: Request, res: Response) => {
       description,
       color,
       mrp,
-      quantity,
       existingProductId,
       frontImage,
       backImage,
@@ -23,6 +22,14 @@ export const uploadProduct = async (req: Request, res: Response) => {
       detailImages,
       otherImages,
     } = req.body;
+
+    // Validate user authentication
+    if (!req.user?.userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
 
     // Start a transaction
     const result = await prisma.$transaction(async (tx) => {
@@ -62,9 +69,33 @@ export const uploadProduct = async (req: Request, res: Response) => {
           productId,
           color: color,
           mrp: mrp ? parseFloat(mrp) : null,
-          stock: parseInt(quantity),
         },
       });
+
+      // Create product sizes
+      if (req.body.sizes && Array.isArray(req.body.sizes)) {
+        for (const sizeData of req.body.sizes) {
+          const size = await tx.productSize.findFirst({
+            where: {
+              id: sizeData.sizeId,
+            },
+          });
+
+          if (!size) {
+            throw new Error(`Size with id '${sizeData.sizeId}' not found`);
+          }
+
+          await tx.variationSize.create({
+            data: {
+              variationId: variation.id,
+              quantity: sizeData.quantity,
+              sizeId: size.id,
+            },
+          });
+        }
+      } else {
+        throw new Error("At least one size with quantity is required");
+      }
 
       // Create product image record
       const productImage = await tx.productImage.create({

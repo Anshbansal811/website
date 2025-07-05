@@ -19,7 +19,6 @@ export const getAllExistingProduct = async (req: Request, res: Response) => {
           select: {
             color: true,
             mrp: true,
-            stock: true,
             images: {
               select: {
                 images: {

@@ -1,11 +1,17 @@
 export interface FormData {
-  quantity: string;
   productType: string;
   color: string;
   mrp?: string;
   productName: string;
   description: string;
   existingProductId?: string;
+  sizes: SizeQuantity[];
+}
+
+export interface SizeQuantity {
+  sizeId: string;
+  sizeName: string;
+  quantity: number;
 }
 
 export interface ExistingProduct {
@@ -15,12 +21,15 @@ export interface ExistingProduct {
     name: string;
   };
 }
+
 export interface ProductType {
   id: string;
   name: string;
-  type: {
-    name: string;
-  };
+}
+
+export interface Size {
+  id: string;
+  name: string;
 }
 
 export interface ImageFiles {
